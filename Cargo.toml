@@ -1,0 +1,12 @@
+[package]
+name = "gradient_sky"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+bevy = "0.16"
+
+[dev-dependencies]
+bevy_flycam = "0.16.1"
+bevy-inspector-egui = "0.33"
+egui-colorgradient = "0.2.3"
