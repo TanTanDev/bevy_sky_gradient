@@ -3,7 +3,7 @@ use bevy_flycam::{FlyCam, NoCameraPlayerPlugin};
 use bevy_sky_gradient::{
     cycle::{
         SkyColorsBuilder, SkyCyclePlugin, SkyTimeSettings, StopsColors, SunDriverPlugin,
-        SunDriverTag,
+        SunDriverTag, SunSettings,
     },
     gradient_material::SkyGradientMaterial,
     plugin::SkyGradientPlugin,
@@ -53,6 +53,9 @@ fn main() {
         .add_plugins(SunDriverPlugin {
             // WE WILL spawn the suns light directional light manually
             spawn_default_sun: false,
+            sun_settings: SunSettings {
+                illuminance: AMBIENT_DAYLIGHT,
+            },
         })
         .add_systems(Startup, setup)
         .run();

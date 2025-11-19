@@ -85,9 +85,17 @@ fn drive_gradients(
     skybox_material.color_stops[3] = color_from_gradient(&sky_colors.sky_color3).into();
 }
 
-#[derive(Resource, Reflect)]
+#[derive(Resource, Reflect, Clone)]
 pub struct SunSettings {
-    illuminance: f32,
+    pub illuminance: f32,
+}
+
+impl Default for SunSettings {
+    fn default() -> Self {
+        Self {
+            illuminance: AMBIENT_DAYLIGHT,
+        }
+    }
 }
 
 // Marker for updating the position of the light, not needed unless we have multiple lights
@@ -98,11 +106,13 @@ pub struct SunDriverTag;
 ///! THIS PLUGIN REQUIRES A SkyCyclePlugin
 pub struct SunDriverPlugin {
     pub spawn_default_sun: bool,
+    pub sun_settings: SunSettings,
 }
 impl Default for SunDriverPlugin {
     fn default() -> Self {
         Self {
             spawn_default_sun: true,
+            sun_settings: SunSettings::default(),
         }
     }
 }
@@ -110,9 +120,7 @@ impl Default for SunDriverPlugin {
 impl Plugin for SunDriverPlugin {
     fn build(&self, app: &mut App) {
         app.register_type::<SunSettings>();
-        app.insert_resource(SunSettings {
-            illuminance: AMBIENT_DAYLIGHT,
-        });
+        app.insert_resource(self.sun_settings.clone());
         app.add_systems(PostUpdate, drive_sun);
         if self.spawn_default_sun {
             app.add_systems(Startup, spawn_default_sun);
