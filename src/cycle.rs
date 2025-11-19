@@ -4,7 +4,7 @@ use egui_colorgradient::{Gradient, InterpolationMethod};
 
 use crate::gradient_material::SkyGradientMaterial;
 
-///  cycle has 2 plugins: SkyCyclePlugin and SunDriverPlugin
+// cycle.rs has 2 plugins: SkyCyclePlugin and SunDriverPlugin
 
 ///! this plugin controlls the colors of our skygradient
 ///! through our SkyTime
@@ -227,10 +227,9 @@ pub struct SkyTimeSettings {
     pub day_time_sec: f32,
     // how many seconds of night light
     pub night_time_sec: f32,
-
-    // seconds of sunrise, INSIDE the day time
+    // seconds of sunrise, ("steals" from day time)
     pub sunrise_time_sec: f32,
-    // seconds of sunset, INSIDE the night time
+    // seconds of sunset, ("steals" from night time)
     pub sunset_time_sec: f32,
 }
 
