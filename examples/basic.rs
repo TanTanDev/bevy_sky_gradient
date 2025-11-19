@@ -62,7 +62,7 @@ fn setup(
             sun_color: Vec4::new(1.0, 1.0, 0.2, 1.0),
             sun_strength: 1.5,
             sun_sharpness: 164.0,
-            time_percent: 0.0,
+            night_time_distance: 0.0,
         })),
         Transform::from_xyz(0.0, 0.5, 0.0),
     ));

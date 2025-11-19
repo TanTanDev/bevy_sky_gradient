@@ -25,7 +25,7 @@ var<uniform> sun_strength: f32;
 @group(2) @binding(6)
 var<uniform> sun_sharpness: f32;
 @group(2) @binding(7)
-var<uniform> time_percent: f32;
+var<uniform> night_time_distance: f32;
 
 
 struct VertexOutput {
@@ -70,9 +70,8 @@ fn fragment(in: VertexOutput) -> @location(0) vec4<f32> {
     var star_intensity = smoothstep(0.93, 1.0, noise);
     
     var glow = smoothstep(0.91, 1.0, noise2);
+    // let star = (star_intensity + glow*0.2*((sin(globals.time*5.0 + r*6.0)*0.5)+0.5))*pow(mask, 3.0);
     let star = (star_intensity + glow*0.2*((sin(globals.time*5.0 + r*6.0)*0.5)+0.5))*pow(mask, 3.0);
-    // let star = star_intensity;
-    // let star = noise;
 
 
     var base_color: vec4<f32> = color_stops[0];
@@ -100,7 +99,7 @@ fn fragment(in: VertexOutput) -> @location(0) vec4<f32> {
     let sun_factor = pow(max(dot(view_dir, normalize(sun_dir)), 0.0), sun_sharpness);
     let sun_contrib = sun_color * (sun_factor * sun_strength);
 
-    let star_visibility = smoothstep(0.4, 0.9, time_percent);
+    let star_visibility = smoothstep(0.4, 0.9, night_time_distance);
     return base_color + sun_contrib + star * star_visibility;
 }
 

@@ -1,4 +1,13 @@
 use bevy::prelude::*;
+
+pub fn default_sky_mesh() -> Mesh {
+    // safety: unwrap is okay, because ico shape only fails
+    // if there are to many vertices
+    let mut mesh = Sphere::new(1.0).mesh().ico(0).unwrap();
+    flip_mesh_normals(&mut mesh);
+    mesh
+}
+
 pub fn flip_mesh_normals(mesh: &mut Mesh) {
     if let Some(normals) = mesh.attribute_mut(Mesh::ATTRIBUTE_NORMAL) {
         if let bevy::render::mesh::VertexAttributeValues::Float32x3(values) = normals {

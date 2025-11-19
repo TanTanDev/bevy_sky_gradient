@@ -3,10 +3,15 @@ name = "gradient_sky"
 version = "0.1.0"
 edition = "2024"
 
+[features]
+default = ["cycle"]
+# our built in day-night cycle implementation, uses cycle::Gradient
+cycle = ["egui-colorgradient", "bevy-inspector-egui"]
+
 [dependencies]
 bevy = "0.16"
+egui-colorgradient = {version="0.2.3", optional = true}
+bevy-inspector-egui = {version = "0.33", optional = true}
 
 [dev-dependencies]
 bevy_flycam = "0.16.1"
-bevy-inspector-egui = "0.33"
-egui-colorgradient = "0.2.3"
