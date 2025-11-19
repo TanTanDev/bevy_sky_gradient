@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_flycam::{FlyCam, NoCameraPlayerPlugin};
-use bevy_gradient_sky::{
+use bevy_sky_gradient::{
     cycle::{SkyCyclePlugin, SunDriverPlugin},
     gradient_material::SkyGradientMaterial,
     plugin::SkyGradientPlugin,

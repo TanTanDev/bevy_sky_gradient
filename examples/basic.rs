@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_flycam::{FlyCam, NoCameraPlayerPlugin};
-use bevy_gradient_sky::{gradient_material::SkyGradientMaterial, plugin::SkyGradientPlugin};
+use bevy_sky_gradient::{gradient_material::SkyGradientMaterial, plugin::SkyGradientPlugin};
 
 use bevy_inspector_egui::{
     bevy_egui::EguiPlugin,
@@ -28,7 +28,7 @@ fn setup(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let mut mesh = Sphere::new(1.0).mesh().ico(8).unwrap();
-    bevy_gradient_sky::utils::flip_mesh_normals(&mut mesh);
+    bevy_sky_gradient::utils::flip_mesh_normals(&mut mesh);
 
     // circular base
     commands.spawn((

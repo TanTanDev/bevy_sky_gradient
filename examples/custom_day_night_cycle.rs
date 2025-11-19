@@ -1,6 +1,6 @@
 use bevy::{color::palettes::css::WHITE, pbr::light_consts::lux::AMBIENT_DAYLIGHT, prelude::*};
 use bevy_flycam::{FlyCam, NoCameraPlayerPlugin};
-use bevy_gradient_sky::{
+use bevy_sky_gradient::{
     cycle::{
         SkyColorsBuilder, SkyCyclePlugin, SkyTimeSettings, StopsColors, SunDriverPlugin,
         SunDriverTag,
@@ -66,7 +66,7 @@ fn setup(
 ) {
     // MANUAL SKYBOX CREATION, using a cuboid mesh instead of Sphere
     let mut mesh = Cuboid::from_length(1.0).mesh().build();
-    bevy_gradient_sky::utils::flip_mesh_normals(&mut mesh);
+    bevy_sky_gradient::utils::flip_mesh_normals(&mut mesh);
     commands.spawn((
         Mesh3d(meshes.add(mesh)),
         MeshMaterial3d(sky_materials.add(SkyGradientMaterial::default())),
