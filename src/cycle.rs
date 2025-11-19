@@ -170,13 +170,13 @@ fn drive_sun(
 #[derive(Resource)]
 pub struct SkyColors {
     // sky color for stop1
-    sky_color0: Gradient,
+    pub sky_color0: Gradient,
     // sky color for stop2
-    sky_color1: Gradient,
+    pub sky_color1: Gradient,
     // sky color for stop3
-    sky_color2: Gradient,
+    pub sky_color2: Gradient,
     // sky color for stop4
-    sky_color3: Gradient,
+    pub sky_color3: Gradient,
 }
 
 impl Clone for SkyColors {
