@@ -1,3 +1,5 @@
+use std::f32::consts::PI;
+
 use bevy::{color::palettes::css::WHITE, pbr::light_consts::lux::AMBIENT_DAYLIGHT, prelude::*};
 use bevy_inspector_egui::egui::Color32;
 use egui_colorgradient::{Gradient, InterpolationMethod};
@@ -142,14 +144,15 @@ fn drive_sun(
     // UPDATE the sun directional light
     let time_rotation = sky_time_settings.time_2pi(sky_time.time);
 
-    let rotation = Quat::from_rotation_x(time_rotation.sin().atan2(time_rotation.cos()));
+    // this rotation is looking at the sun
+    let rotation_to_sun = Quat::from_rotation_x(time_rotation.sin().atan2(time_rotation.cos()));
+    let look_at_sun = rotation_to_sun * Vec3::NEG_Z;
+    let look_away_sun = rotation_to_sun * Quat::from_rotation_x(PI);
     let illuminance = time_rotation.sin().max(0.0).powf(2.0) * sun_settings.illuminance;
-    let mut sun_forward = Vec3::Z;
 
     for (mut light_trans, mut directional) in suns.iter_mut() {
-        light_trans.rotation = rotation;
+        light_trans.rotation = look_away_sun;
         directional.illuminance = illuminance;
-        sun_forward = light_trans.forward().as_vec3();
     }
 
     // UPDATE SKY MATERIAL
@@ -160,7 +163,7 @@ fn drive_sun(
         .get_mut(skybox_material_handle)
         .expect("SkyBoxMaterial");
 
-    skybox_material.sun_dir = sun_forward;
+    skybox_material.sun_dir = look_at_sun;
 }
 
 ///! All colors that controlls the sky gradient, OVER TIME.
