@@ -119,6 +119,7 @@ impl Plugin for SunDriverPlugin {
 }
 fn spawn_default_sun(mut commands: Commands) {
     commands.spawn((
+        Name::new("sky_gradient_sun"),
         DirectionalLight {
             color: WHITE.into(),
             illuminance: AMBIENT_DAYLIGHT,

@@ -35,6 +35,7 @@ fn spawn_default_skybox(
     mut sky_materials: ResMut<Assets<SkyGradientMaterial>>,
 ) {
     commands.spawn((
+        Name::new("sky_gradient_skybox"),
         Mesh3d(meshes.add(utils::default_sky_mesh())),
         MeshMaterial3d(sky_materials.add(SkyGradientMaterial::default())),
     ));
