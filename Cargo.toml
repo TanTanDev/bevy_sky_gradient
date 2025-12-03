@@ -10,6 +10,8 @@ cycle = ["egui-colorgradient", "bevy-inspector-egui"]
 
 [dependencies]
 bevy = "0.16"
+rust-embed = "8" # to embed assets like .wgsl
+
 egui-colorgradient = {version="0.2.3", optional = true}
 bevy-inspector-egui = {version = "0.33", optional = true}
 

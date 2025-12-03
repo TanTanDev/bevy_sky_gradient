@@ -10,6 +10,7 @@ pub struct SkyGradientPlugin {
 
 impl Plugin for SkyGradientPlugin {
     fn build(&self, app: &mut App) {
+        app.add_systems(Startup, crate::assets::initialize_shaders);
         app.add_plugins(MaterialPlugin::<SkyGradientMaterial>::default());
         if self.spawn_default_skybox {
             app.add_systems(Startup, spawn_default_skybox);

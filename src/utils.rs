@@ -3,7 +3,7 @@ use bevy::prelude::*;
 pub fn default_sky_mesh() -> Mesh {
     // safety: unwrap is okay, because ico shape only fails
     // if there are to many vertices
-    let mut mesh = Sphere::new(1.0).mesh().ico(0).unwrap();
+    let mut mesh = Sphere::new(1.0).mesh().ico(6).unwrap();
     flip_mesh_normals(&mut mesh);
     mesh
 }

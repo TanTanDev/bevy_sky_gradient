@@ -21,12 +21,10 @@ fn main() {
         .add_plugins(AssetInspectorPlugin::<SkyGradientMaterial>::default())
         // camera
         .add_plugins(NoCameraPlayerPlugin)
-        // skygradient plugin
+        // sky plugins
         .add_plugins(SkyGradientPlugin {
-            // WE WILL spawn the skybox manually
             spawn_default_skybox: false,
         })
-        // cycle plugins
         .add_plugins(SkyCyclePlugin {
             sky_time_settings: SkyTimeSettings {
                 day_time_sec: 10.0,
@@ -51,7 +49,6 @@ fn main() {
             },
         })
         .add_plugins(SunDriverPlugin {
-            // WE WILL spawn the suns light directional light manually
             spawn_default_sun: false,
             sun_settings: SunSettings {
                 illuminance: AMBIENT_DAYLIGHT,
