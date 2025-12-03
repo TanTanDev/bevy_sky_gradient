@@ -78,6 +78,16 @@ var<uniform> aurora_sparkle_threshold: f32;
 @group(2) @binding(31)
 var<uniform> aurora_sparkle_max_height: f32;
 
+@group(2) @binding(32)
+var noise3_texture: texture_3d<f32>;
+@group(2) @binding(33)
+var noise3_texture_sampler: sampler;
+
+@group(2) @binding(34)
+var voronoi3_texture: texture_3d<f32>;
+@group(2) @binding(35)
+var voronoi3_texture_sampler: sampler;
+
 
 
 struct VertexOutput {
@@ -108,24 +118,26 @@ fn stars(view_dir: vec3<f32>) -> f32 {
     );
     let offset_world_dir = rotation_matrix * view_dir;
 
-    var noise = 1.0-voronoi3(offset_world_dir*60.0).x;
-    let mask = noise3(offset_world_dir*70.0);
-    let variance_noise = noise3(offset_world_dir*20.0);
+    var noise = 1.0-voronoi3(offset_world_dir*9.0);
+    let mask = noise3(offset_world_dir);
+    let variance_noise = noise3(offset_world_dir*0.1);
 
     // reduce star density with mask
     noise = noise * (1.0-pow(mask, 6.0));
 
-    let blink_speed = globals.time * 20.0;
+    let blink_speed = globals.time * 10.0;
     // star blink in different speeds
-    let speed_variance = (1.0 + sin(variance_noise * 30.0)*0.50);
+    let speed_variance = (1.0 + sin(variance_noise * 1.3)*0.50);
     // stars should not blink the same time
-    let blink_offset = variance_noise * 10.0;
+    let blink_offset = variance_noise * 0.1;
     // 0: no blink, 1: full blink
     let blink = cos(blink_speed*speed_variance+blink_offset);
     // how large the blink is visually
     let blink_strength = 0.01;
     // reduce voroni to "dots" in range 0.93-1
-    var star_intensity = smoothstep(0.93+blink*blink_strength, 1.0, noise);
+    // var star_intensity = smoothstep(0.93+blink*blink_strength, 1.0, noise);
+    var star_intensity = smoothstep(0.9+blink*blink_strength, 1.0, noise);
+    // var star_intensity = smoothstep(0.83+blink*blink_strength, 1.0, noise);
     return star_intensity;
 }
 
@@ -176,67 +188,14 @@ fn fragment(in: VertexOutput) -> @location(0) vec4<f32> {
     return base_color + sun_contrib + star * night_visibility + north * night_visibility;
 }
 
-// MIT License. © Stefan Gustavson, Munrocket
-fn mod289(x: vec4f) -> vec4f { return x - floor(x * (1. / 289.)) * 289.; }
-fn perm4(x: vec4f) -> vec4f { return mod289(((x * 34.) + 1.) * x); }
 
 fn noise3(p: vec3f) -> f32 {
-    let a = floor(p);
-    var d: vec3f = p - a;
-    d = d * d * (3. - 2. * d);
-
-    let b = a.xxyy + vec4f(0., 1., 0., 1.);
-    let k1 = perm4(b.xyxy);
-    let k2 = perm4(k1.xyxy + b.zzww);
-
-    let c = k2 + a.zzzz;
-    let k3 = perm4(c);
-    let k4 = perm4(c + 1.);
-
-    let o1 = fract(k3 * (1. / 41.));
-    let o2 = fract(k4 * (1. / 41.));
-
-    let o3 = o2 * d.z + o1 * (1. - d.z);
-    let o4 = o3.yw * d.x + o3.xz * (1. - d.x);
-
-    return o4.y * d.y + o4.x * (1. - d.y);
+    return textureSample(noise3_texture, noise3_texture_sampler, p).r;
 }
 
-fn voronoi3(p: vec3f) -> vec2f {
-    let n = floor(p);
-    let f = fract(p);
-    
-    var min_dist = 1.0;
-    var second_min = 1.0;
-    
-    for (var k = -1; k <= 1; k++) {
-        for (var j = -1; j <= 1; j++) {
-            for (var i = -1; i <= 1; i++) {
-                let g = vec3f(f32(i), f32(j), f32(k));
-                let o = hash33(n + g);  // Random offset for this cell
-                let r = g + o - f;
-                let d = length(r);
-                
-                if d < min_dist {
-                    second_min = min_dist;
-                    min_dist = d;
-                } else if d < second_min {
-                    second_min = d;
-                }
-            }
-        }
-    }
-    
-    return vec2f(min_dist, second_min);
+fn voronoi3(p: vec3f) -> f32 {
+    return textureSample(voronoi3_texture, voronoi3_texture_sampler, p).r;
 }
-
-// Hash function for Voronoi
-fn hash33(p: vec3f) -> vec3f {
-    var p3 = fract(p * vec3f(0.1031, 0.1030, 0.0973));
-    p3 += dot(p3, p3.yxz + 33.33);
-    return fract((p3.xxy + p3.yxx) * p3.zyx);
-}
-
 
 fn aurora(view_dir: vec3<f32>) -> vec4<f32> {
     // Ensure at least 2 samples

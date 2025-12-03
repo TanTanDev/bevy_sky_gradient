@@ -78,6 +78,12 @@ pub struct SkyGradientMaterial {
     pub aurora_sparkle_threshold: f32,
     #[uniform(31)]
     pub aurora_sparkle_max_height: f32,
+    #[texture(32, dimension = "3d")]
+    #[sampler(33)]
+    pub noise3_image: Handle<Image>,
+    #[texture(34, dimension = "3d")]
+    #[sampler(35)]
+    pub voronoi3_image: Handle<Image>,
 }
 
 impl Material for SkyGradientMaterial {
@@ -123,27 +129,29 @@ impl Default for SkyGradientMaterial {
             sky_rotation_speed: 0.01,
             // aurora_color: Vec4::new(0.6, 1.0, 0.8, 1.0),
             aurora_color_bottom: LinearRgba::new(0.0, 1.0, 0.2, 1.0),
-            aurora_strength: 0.2,
+            aurora_strength: 0.7,
             aurora_speed: 0.2,
-            aurora_scale: 0.07,
+            aurora_scale: 0.05,
             aurora_wave_count: 0.2,
             aurora_sharpness: 1.56,
-            aurora_num_samples: 40,      // default: 15.0
-            aurora_base_height: 3.1,     // default: 35.0
-            aurora_top_height: 4.8,      // default: 0.3 (controls how much bands rotate)
-            aurora_rotation_scale: 0.05, // default: 8 (quality vs performance)
-            aurora_rotation_strength: 22.3,
-            aurora_flow_speed: 0.1,
-            aurora_small_wiggle_scale: 3.9,
-            aurora_small_wiggle_strength: 0.55,
-            aurora_small_wiggle_speed: 1.84,
+            aurora_num_samples: 40,       // default: 15.0
+            aurora_base_height: 3.1,      // default: 35.0
+            aurora_top_height: 4.8,       // default: 0.3 (controls how much bands rotate)
+            aurora_rotation_scale: 0.002, // default: 8 (quality vs performance)
+            aurora_rotation_strength: 4.3,
+            aurora_flow_speed: 0.005,
+            aurora_small_wiggle_scale: 0.03,
+            aurora_small_wiggle_strength: 1.05,
+            aurora_small_wiggle_speed: 0.1,
             aurora_color_top: LinearRgba::new(0.0, 1.0, 0.8, 1.0),
             aurora_sparkle_color1: LinearRgba::new(0.0, 1.0, 0.0, 1.0),
             aurora_sparkle_color2: LinearRgba::new(0.8, 0.2, 1.0, 1.0),
-            aurora_sparkle_scale: 0.85,
-            aurora_sparkle_speed: 1.05,
-            aurora_sparkle_threshold: 0.15,
+            aurora_sparkle_scale: 0.004,
+            aurora_sparkle_speed: 0.02,
+            aurora_sparkle_threshold: 0.3,
             aurora_sparkle_max_height: 0.3,
+            noise3_image: Handle::default(),
+            voronoi3_image: Handle::default(),
         }
     }
 }

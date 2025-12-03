@@ -1,5 +1,6 @@
 pub mod assets;
 pub mod gradient_material;
+pub mod noise;
 pub mod plugin;
 pub mod presets;
 pub mod utils;
