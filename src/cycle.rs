@@ -27,8 +27,8 @@ impl Default for SkyCyclePlugin {
 impl Plugin for SkyCyclePlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(SkyTime {
-            time: 0.0,
-            auto_tick: true,
+            time: 23.0,
+            auto_tick: false,
         });
         app.insert_resource(self.sky_time_settings.clone());
         app.insert_resource(
@@ -79,10 +79,14 @@ fn drive_gradients(
             .unwrap()
             .to_array()
     };
-    skybox_material.color_stops[0] = color_from_gradient(&sky_colors.sky_color0).into();
-    skybox_material.color_stops[1] = color_from_gradient(&sky_colors.sky_color1).into();
-    skybox_material.color_stops[2] = color_from_gradient(&sky_colors.sky_color2).into();
-    skybox_material.color_stops[3] = color_from_gradient(&sky_colors.sky_color3).into();
+    skybox_material.gradient_settings.color_stops[0] =
+        color_from_gradient(&sky_colors.sky_color0).into();
+    skybox_material.gradient_settings.color_stops[1] =
+        color_from_gradient(&sky_colors.sky_color1).into();
+    skybox_material.gradient_settings.color_stops[2] =
+        color_from_gradient(&sky_colors.sky_color2).into();
+    skybox_material.gradient_settings.color_stops[3] =
+        color_from_gradient(&sky_colors.sky_color3).into();
 }
 
 #[derive(Resource, Reflect, Clone)]
@@ -171,7 +175,7 @@ fn drive_sun(
         .get_mut(skybox_material_handle)
         .expect("SkyBoxMaterial");
 
-    skybox_material.sun_dir = look_at_sun;
+    skybox_material.sun.sun_dir = look_at_sun;
 }
 
 ///! All colors that controlls the sky gradient, OVER TIME.
