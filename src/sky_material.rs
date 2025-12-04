@@ -4,7 +4,7 @@ use bevy::render::render_resource::{AsBindGroup, CompareFunction, ShaderRef};
 use crate::bind_groups::{AuroraSettings, GradientSettings, StarsSettings, SunSettings};
 
 #[derive(Asset, AsBindGroup, Reflect, Debug, Clone)]
-pub struct SkyGradientMaterial {
+pub struct FullSkyMaterial {
     #[uniform(0)]
     pub gradient_settings: crate::bind_groups::GradientSettings,
     #[uniform(1)]
@@ -32,9 +32,13 @@ pub struct SkyGradientMaterial {
     #[texture(34, dimension = "3d")]
     #[sampler(35)]
     pub voronoi3_image: Handle<Image>,
+
+    #[texture(36, dimension = "2d")]
+    #[sampler(37)]
+    pub aurora_image: Handle<Image>,
 }
 
-impl Material for SkyGradientMaterial {
+impl Material for FullSkyMaterial {
     fn vertex_shader() -> ShaderRef {
         crate::assets::SKY_SHADER_HANDLE.into()
     }
@@ -57,7 +61,7 @@ impl Material for SkyGradientMaterial {
     }
 }
 
-impl Default for SkyGradientMaterial {
+impl Default for FullSkyMaterial {
     fn default() -> Self {
         let color_stops = [
             Vec4::new(0.2, 0.3, 0.6, 1.0),
@@ -65,7 +69,7 @@ impl Default for SkyGradientMaterial {
             Vec4::new(0.35, 0.6, 0.8, 1.0),
             Vec4::new(0.5, 0.7, 1.0, 1.0),
         ];
-        SkyGradientMaterial {
+        FullSkyMaterial {
             gradient_settings: GradientSettings {
                 color_stops,
                 positions: Vec4::new(0.38, 0.47, 0.61, 1.0),
@@ -109,6 +113,7 @@ impl Default for SkyGradientMaterial {
             },
             noise3_image: Handle::default(),
             voronoi3_image: Handle::default(),
+            aurora_image: Handle::default(),
         }
     }
 }

@@ -5,8 +5,8 @@ use bevy_sky_gradient::{
         SkyColorsBuilder, SkyCyclePlugin, SkyTimeSettings, StopsColors, SunDriverPlugin,
         SunDriverTag, SunSettings,
     },
-    gradient_material::SkyGradientMaterial,
     plugin::SkyGradientPlugin,
+    sky_material::FullSkyMaterial,
 };
 
 use bevy_inspector_egui::{bevy_egui::EguiPlugin, egui::Color32, quick::AssetInspectorPlugin};
@@ -18,7 +18,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         // egui
         .add_plugins(EguiPlugin::default())
-        .add_plugins(AssetInspectorPlugin::<SkyGradientMaterial>::default())
+        .add_plugins(AssetInspectorPlugin::<FullSkyMaterial>::default())
         // camera
         .add_plugins(NoCameraPlayerPlugin)
         // sky plugins
@@ -62,14 +62,14 @@ fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    mut sky_materials: ResMut<Assets<SkyGradientMaterial>>,
+    mut sky_materials: ResMut<Assets<FullSkyMaterial>>,
 ) {
     // MANUAL SKYBOX CREATION, using a cuboid mesh instead of Sphere
     let mut mesh = Cuboid::from_length(1.0).mesh().build();
     bevy_sky_gradient::utils::flip_mesh_normals(&mut mesh);
     commands.spawn((
         Mesh3d(meshes.add(mesh)),
-        MeshMaterial3d(sky_materials.add(SkyGradientMaterial::default())),
+        MeshMaterial3d(sky_materials.add(FullSkyMaterial::default())),
     ));
 
     // MANUAL SUN LIGHT SOURCE creation

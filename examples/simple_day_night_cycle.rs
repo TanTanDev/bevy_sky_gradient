@@ -2,8 +2,8 @@ use bevy::prelude::*;
 use bevy_flycam::{FlyCam, NoCameraPlayerPlugin};
 use bevy_sky_gradient::{
     cycle::{SkyCyclePlugin, SunDriverPlugin},
-    gradient_material::SkyGradientMaterial,
     plugin::SkyGradientPlugin,
+    sky_material::FullSkyMaterial,
 };
 
 use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::AssetInspectorPlugin};
@@ -15,7 +15,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         // egui
         .add_plugins(EguiPlugin::default())
-        .add_plugins(AssetInspectorPlugin::<SkyGradientMaterial>::default())
+        .add_plugins(AssetInspectorPlugin::<FullSkyMaterial>::default())
         // camera
         .add_plugins(NoCameraPlayerPlugin)
         // SKY PLUGINS

@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_flycam::{FlyCam, NoCameraPlayerPlugin};
-use bevy_sky_gradient::{gradient_material::SkyGradientMaterial, plugin::SkyGradientPlugin};
+use bevy_sky_gradient::{plugin::SkyGradientPlugin, sky_material::FullSkyMaterial};
 
 use bevy_inspector_egui::{
     bevy_egui::EguiPlugin,
@@ -12,7 +12,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugins(EguiPlugin::default())
         .add_plugins(WorldInspectorPlugin::new())
-        .add_plugins(AssetInspectorPlugin::<SkyGradientMaterial>::default())
+        .add_plugins(AssetInspectorPlugin::<FullSkyMaterial>::default())
         .add_systems(Startup, setup)
         .add_systems(Update, sky_follow_camera)
         .add_plugins(NoCameraPlayerPlugin)
@@ -24,7 +24,7 @@ fn main() {
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut sky_materials: ResMut<Assets<SkyGradientMaterial>>,
+    mut sky_materials: ResMut<Assets<FullSkyMaterial>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let mut mesh = Sphere::new(1.0).mesh().ico(8).unwrap();
@@ -45,7 +45,7 @@ fn setup(
 
     commands.spawn((
         Mesh3d(meshes.add(mesh)),
-        MeshMaterial3d(sky_materials.add(SkyGradientMaterial {
+        MeshMaterial3d(sky_materials.add(FullSkyMaterial {
             color_stops: [
                 Vec4::new(0.2, 0.3, 0.6, 1.0),
                 Vec4::new(0.4, 0.5, 1.0, 1.0),
@@ -75,10 +75,7 @@ fn setup(
 }
 fn sky_follow_camera(
     camera_query: Query<&Transform, With<Camera>>,
-    mut sky_query: Query<
-        &mut Transform,
-        (Without<Camera>, With<MeshMaterial3d<SkyGradientMaterial>>),
-    >,
+    mut sky_query: Query<&mut Transform, (Without<Camera>, With<MeshMaterial3d<FullSkyMaterial>>)>,
 ) {
     if let Ok(cam_tf) = camera_query.single() {
         for mut tf in &mut sky_query {

@@ -1,16 +1,20 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, render::view::RenderLayers};
 use bevy_flycam::{FlyCam, NoCameraPlayerPlugin};
 use bevy_sky_gradient::{
+    aurora_material::AuroraMaterial,
     cycle::{SkyColors, SkyCyclePlugin, SkyTime, SunDriverPlugin, SunDriverTag, SunSettings},
-    gradient_material::SkyGradientMaterial,
     plugin::SkyGradientPlugin,
+    sky_material::FullSkyMaterial,
 };
 
 use bevy_inspector_egui::{
-    bevy_egui::{self, EguiContext, EguiPlugin, EguiPrimaryContextPass},
+    bevy_egui::{
+        self, EguiContext, EguiGlobalSettings, EguiPlugin, EguiPrimaryContextPass,
+        PrimaryEguiContext,
+    },
     bevy_inspector::ui_for_resource,
     egui,
-    quick::AssetInspectorPlugin,
+    quick::{AssetInspectorPlugin, WorldInspectorPlugin},
 };
 use egui_colorgradient::gradient_editor;
 
@@ -20,7 +24,9 @@ fn main() {
         .add_plugins(DefaultPlugins)
         // egui
         .add_plugins(EguiPlugin::default())
-        .add_plugins(AssetInspectorPlugin::<SkyGradientMaterial>::default())
+        .add_plugins(WorldInspectorPlugin::new())
+        .add_plugins(AssetInspectorPlugin::<FullSkyMaterial>::default())
+        .add_plugins(AssetInspectorPlugin::<AuroraMaterial>::default())
         // camera
         .add_plugins(NoCameraPlayerPlugin)
         // SKY PLUGINS
@@ -36,12 +42,15 @@ fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    mut egui_global_settings: ResMut<EguiGlobalSettings>,
 ) {
+    egui_global_settings.auto_create_primary_context = false;
     // spawn a flat circular base.
     commands.spawn((
         Mesh3d(meshes.add(Circle::new(3.0))),
         MeshMaterial3d(materials.add(Color::WHITE)),
-        Transform::from_rotation(Quat::from_rotation_x(-std::f32::consts::FRAC_PI_2)),
+        Transform::from_rotation(Quat::from_rotation_x(-std::f32::consts::FRAC_PI_2))
+            .with_translation(Vec3::new(0.0, -2.0, 0.0)),
     ));
 
     // camera
@@ -49,6 +58,17 @@ fn setup(
         Camera3d::default(),
         Transform::from_xyz(-0.4, 0.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
         FlyCam,
+    ));
+
+    // egui
+    commands.spawn((
+        PrimaryEguiContext,
+        Camera3d::default(),
+        Camera {
+            order: 1,
+            ..default()
+        },
+        RenderLayers::none(),
     ));
 }
 

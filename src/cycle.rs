@@ -4,7 +4,7 @@ use bevy::{color::palettes::css::WHITE, pbr::light_consts::lux::AMBIENT_DAYLIGHT
 use bevy_inspector_egui::egui::Color32;
 use egui_colorgradient::{Gradient, InterpolationMethod};
 
-use crate::gradient_material::SkyGradientMaterial;
+use crate::sky_material::FullSkyMaterial;
 
 // cycle.rs has 2 plugins: SkyCyclePlugin and SunDriverPlugin
 
@@ -59,8 +59,8 @@ fn drive_gradients(
     sky_time_settings: Res<SkyTimeSettings>,
     sky_time: Res<SkyTime>,
     sky_colors: Res<SkyColors>,
-    skyboxes: Query<&mut MeshMaterial3d<SkyGradientMaterial>>,
-    mut sky_materials: ResMut<Assets<SkyGradientMaterial>>,
+    skyboxes: Query<&mut MeshMaterial3d<FullSkyMaterial>>,
+    mut sky_materials: ResMut<Assets<FullSkyMaterial>>,
 ) {
     let skybox_material_handle = skyboxes
         .single()
@@ -150,8 +150,8 @@ fn drive_sun(
     sky_time_settings: Res<SkyTimeSettings>,
     sky_time: Res<SkyTime>,
     sun_settings: Res<SunSettings>,
-    skyboxes: Query<&mut MeshMaterial3d<SkyGradientMaterial>>,
-    mut sky_materials: ResMut<Assets<SkyGradientMaterial>>,
+    skyboxes: Query<&mut MeshMaterial3d<FullSkyMaterial>>,
+    mut sky_materials: ResMut<Assets<FullSkyMaterial>>,
 ) {
     // UPDATE the sun directional light
     let time_rotation = sky_time_settings.time_2pi(sky_time.time);
