@@ -5,7 +5,7 @@ use bevy::{
     render::render_resource::{Extent3d, TextureDimension},
 };
 
-use crate::{aurora_material::AuroraMaterial, sky_material::FullSkyMaterial};
+use crate::sky_material::FullSkyMaterial;
 // we will bake noise funcitons into textures for performance reasons
 // 3D textures for noise3d, and voronoi3d
 
@@ -57,8 +57,6 @@ pub fn update_noise_textures(
     noise_handles: Res<NoiseHandles>,
     mut sky_handles: Query<&mut MeshMaterial3d<FullSkyMaterial>>,
     mut sky_materials: ResMut<Assets<FullSkyMaterial>>,
-    mut aurora_handles: Query<&mut MeshMaterial3d<AuroraMaterial>>,
-    mut aurora_materials: ResMut<Assets<AuroraMaterial>>,
     mut repeated_calls: Local<i32>,
 ) {
     if !noise_settings.is_changed() {
@@ -83,11 +81,6 @@ pub fn update_noise_textures(
         if let Some(sky_material) = sky_materials.get_mut(&sky_handle.0) {
             sky_material.noise3_texture_size = noise_size as f32;
             sky_material.voronoi3_texture_size = voronoi_size as f32;
-        }
-    }
-    for aurora_handle in aurora_handles.iter_mut() {
-        if let Some(aurora_material) = aurora_materials.get_mut(&aurora_handle.0) {
-            aurora_material.noise3_texture_size = noise_size as f32;
         }
     }
     // update full sky material

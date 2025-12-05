@@ -11,10 +11,8 @@
 var<uniform> aurora_settings: AuroraSettings;
 
 @group(2) @binding(1)
-var<uniform> noise3_scale: f32;
-@group(2) @binding(2)
 var noise3_texture: texture_3d<f32>;
-@group(2) @binding(3)
+@group(2) @binding(2)
 var noise3_texture_sampler: sampler;
 
 struct VertexOutput {
