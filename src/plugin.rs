@@ -1,10 +1,12 @@
 use bevy::{
     asset::RenderAssetUsages,
+    image::ImageSampler,
     prelude::*,
     render::{
         render_resource::{Extent3d, TextureDimension, TextureFormat, TextureUsages},
         view::RenderLayers,
     },
+    window::WindowResized,
 };
 
 use crate::{
@@ -33,7 +35,12 @@ impl Plugin for SkyGradientPlugin {
         }
         app.add_systems(
             PostUpdate,
-            (sky_follow_camera, aurora_follow_camera).before(TransformSystem::TransformPropagate),
+            (
+                sky_follow_camera,
+                aurora_follow_camera,
+                resize_aurora_on_window_change,
+            )
+                .before(TransformSystem::TransformPropagate),
         );
     }
 }
@@ -111,6 +118,7 @@ fn spawn_aurora_skybox(
         TextureFormat::Bgra8UnormSrgb,
         RenderAssetUsages::default(),
     );
+    aurora_image.sampler = ImageSampler::linear();
     aurora_image.texture_descriptor.usage =
         TextureUsages::TEXTURE_BINDING | TextureUsages::COPY_DST | TextureUsages::RENDER_ATTACHMENT;
 
@@ -167,6 +175,27 @@ fn aurora_follow_camera(
             for mut aurora_tf in aurora_mesh.iter_mut() {
                 aurora_tf.translation = cam_tf.translation;
             }
+        }
+    }
+}
+
+fn resize_aurora_on_window_change(
+    mut resize_events: EventReader<WindowResized>,
+    mut images: ResMut<Assets<Image>>,
+    aurora_handles: Res<AuroraHandles>,
+) {
+    for event in resize_events.read() {
+        let aspect = event.width / event.height;
+        // let width = 256;
+        let width = 514;
+        let height = (width as f32 / aspect) as u32;
+
+        if let Some(image) = images.get_mut(&aurora_handles.render_target) {
+            image.resize(Extent3d {
+                width,
+                height,
+                depth_or_array_layers: 1,
+            });
         }
     }
 }
