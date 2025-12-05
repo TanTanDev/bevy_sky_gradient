@@ -10,19 +10,14 @@
 @group(2) @binding(0)
 var<uniform> aurora_settings: AuroraSettings;
 
-@group(2) @binding(7)
-var<uniform> night_time_distance: f32;
-@group(2) @binding(8)
-var<uniform> night_visibility_range: vec2<f32>;
-
-@group(2) @binding(32)
+@group(2) @binding(1)
 var noise3_texture: texture_3d<f32>;
-@group(2) @binding(33)
+@group(2) @binding(2)
 var noise3_texture_sampler: sampler;
 
-@group(2) @binding(34)
+@group(2) @binding(3)
 var voronoi3_texture: texture_3d<f32>;
-@group(2) @binding(35)
+@group(2) @binding(4)
 var voronoi3_texture_sampler: sampler;
 
 struct VertexOutput {
@@ -43,16 +38,8 @@ fn vertex(@location(0) position: vec3<f32>, @builtin(instance_index) vertin: u32
 @fragment
 fn fragment(in: VertexOutput) -> @location(0) vec4<f32> {
     let view_dir = normalize(in.world_dir);
-
     let north = aurora(view_dir, aurora_settings, globals.time, noise3_texture, noise3_texture_sampler);
-    // only show star in night
-    let night_visibility = smoothstep(night_visibility_range.x,
-        night_visibility_range.y,
-        night_time_distance);
-
-    // return north * night_visibility;
     return north;
-    // return vec4f(1.0,1.0,0.0,1.0);
 }
 
 

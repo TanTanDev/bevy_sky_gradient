@@ -7,24 +7,12 @@ use crate::bind_groups::AuroraSettings;
 pub struct AuroraMaterial {
     #[uniform(0)]
     pub aurora_settings: crate::bind_groups::AuroraSettings,
-    ///! auto set. 0 = NO night, 1 = FULL night
-    ///! a full night cycle will go from 0 -> 1 -> 0
-    #[uniform(7)]
-    pub night_time_distance: f32,
-    ///! when in the night time to show the stars
-    ///! x: when to start showing star
-    ///! y: when the brightness of star is MAXED out
-    ///! example: (0.0, 0.1).
-    ///! 0.0: start showing sky immediately when sunset begins
-    ///! 0.1: sky brightness is maxed out 10% into the night
-    #[uniform(8)]
-    pub night_visibility_range: Vec2,
 
-    #[texture(32, dimension = "3d")]
-    #[sampler(33)]
+    #[texture(1, dimension = "3d")]
+    #[sampler(2)]
     pub noise3_image: Handle<Image>,
-    #[texture(34, dimension = "3d")]
-    #[sampler(35)]
+    #[texture(3, dimension = "3d")]
+    #[sampler(4)]
     pub voronoi3_image: Handle<Image>,
 }
 
@@ -54,17 +42,15 @@ impl Material for AuroraMaterial {
 impl Default for AuroraMaterial {
     fn default() -> Self {
         AuroraMaterial {
-            night_time_distance: 0.0,
-            night_visibility_range: vec2(0.0, 0.1),
             aurora_settings: AuroraSettings {
                 color_bottom: LinearRgba::new(0.0, 1.0, 0.2, 1.0),
                 alpha: 0.7,
                 density: 0.05,
                 sharpness: 1.56,
-                num_samples: 40,   // default: 15.0
-                start_height: 3.1, // default: 35.0
-                end_height: 4.8,   // default: 0.3 (controls how much bands rotate)
-                flow_scale: 0.002, // default: 8 (quality vs performance)
+                num_samples: 40,
+                start_height: 3.1,
+                end_height: 4.8,
+                flow_scale: 0.002,
                 flow_strength: 4.3,
                 flow_speed: 0.005,
                 wiggle_scale: 0.03,

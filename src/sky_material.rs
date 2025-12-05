@@ -1,21 +1,19 @@
 use bevy::prelude::*;
 use bevy::render::render_resource::{AsBindGroup, CompareFunction, ShaderRef};
 
-use crate::bind_groups::{AuroraSettings, GradientSettings, StarsSettings, SunSettings};
+use crate::bind_groups::{GradientSettings, StarsSettings, SunSettings};
 
 #[derive(Asset, AsBindGroup, Reflect, Debug, Clone)]
 pub struct FullSkyMaterial {
     #[uniform(0)]
     pub gradient_settings: crate::bind_groups::GradientSettings,
     #[uniform(1)]
-    pub aurora_settings: crate::bind_groups::AuroraSettings,
-    #[uniform(2)]
     pub sun: crate::bind_groups::SunSettings,
-    #[uniform(3)]
+    #[uniform(2)]
     pub stars: crate::bind_groups::StarsSettings,
     ///! auto set. 0 = NO night, 1 = FULL night
     ///! a full night cycle will go from 0 -> 1 -> 0
-    #[uniform(7)]
+    #[uniform(3)]
     pub night_time_distance: f32,
     ///! when in the night time to show the stars
     ///! x: when to start showing star
@@ -23,18 +21,19 @@ pub struct FullSkyMaterial {
     ///! example: (0.0, 0.1).
     ///! 0.0: start showing sky immediately when sunset begins
     ///! 0.1: sky brightness is maxed out 10% into the night
-    #[uniform(8)]
+    #[uniform(4)]
     pub night_visibility_range: Vec2,
 
-    #[texture(32, dimension = "3d")]
-    #[sampler(33)]
+    // noise
+    #[texture(10, dimension = "3d")]
+    #[sampler(11)]
     pub noise3_image: Handle<Image>,
-    #[texture(34, dimension = "3d")]
-    #[sampler(35)]
+    #[texture(12, dimension = "3d")]
+    #[sampler(13)]
     pub voronoi3_image: Handle<Image>,
 
-    #[texture(36, dimension = "2d")]
-    #[sampler(37)]
+    #[texture(14, dimension = "2d")]
+    #[sampler(15)]
     pub aurora_image: Handle<Image>,
 }
 
@@ -75,9 +74,6 @@ impl Default for FullSkyMaterial {
                 positions: Vec4::new(0.38, 0.47, 0.61, 1.0),
                 num_stops: 4,
             },
-            // color_stops,
-            // positions: Vec4::new(0.38, 0.47, 0.61, 1.0),
-            // num_stops: 4,
             sun: SunSettings {
                 sun_dir: Vec3::new(0.0, 0.1, -1.0),
                 sun_color: Vec4::new(1.0, 1.0, 0.5, 1.0),
@@ -88,28 +84,6 @@ impl Default for FullSkyMaterial {
             night_visibility_range: vec2(0.0, 0.1),
             stars: StarsSettings {
                 sky_rotation_speed: 0.01,
-            },
-            aurora_settings: AuroraSettings {
-                color_bottom: LinearRgba::new(0.0, 1.0, 0.2, 1.0),
-                alpha: 0.7,
-                density: 0.05,
-                sharpness: 1.56,
-                num_samples: 40,   // default: 15.0
-                start_height: 3.1, // default: 35.0
-                end_height: 4.8,   // default: 0.3 (controls how much bands rotate)
-                flow_scale: 0.002, // default: 8 (quality vs performance)
-                flow_strength: 4.3,
-                flow_speed: 0.005,
-                wiggle_scale: 0.03,
-                wiggle_strength: 1.05,
-                wiggle_speed: 0.1,
-                color_top: LinearRgba::new(0.0, 1.0, 0.8, 1.0),
-                undersparkle_color_primary: LinearRgba::new(0.0, 1.0, 0.0, 1.0),
-                undersparkle_color_secondary: LinearRgba::new(0.8, 0.2, 1.0, 1.0),
-                undersparkle_scale: 0.004,
-                undersparkle_speed: 0.02,
-                undersparkle_threshold: 0.3,
-                undersparkle_height: 0.3,
             },
             noise3_image: Handle::default(),
             voronoi3_image: Handle::default(),

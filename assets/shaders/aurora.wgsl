@@ -1,19 +1,19 @@
 #import "shaders/noise.wgsl"::{noise};
 
 struct AuroraSettings {
-    bottom_color: vec4<f32>,       // default: vec4<f32>(0.6,1.0,0.8,1.0)
-    alpha: f32,         // default: 1.0
-    density: f32,            // default: 3.0
-    sharpness: f32,        // default: 4.0
-    num_samples: i32,      // default: 8 (quality vs performance)
-    start_height: f32,      // default: 15.0
-    end_height: f32,       // default: 35.0
-    flow_scale: f32,   // default: 0.3 (controls how much bands rotate)
-    flow_strength: f32,   // default: 0.3 (controls how much bands rotate)
-    flow_speed: f32,   // default: 0.3 (controls how much bands rotate)
-    wiggle_scale: f32, // default: 0.3 (controls how much bands rotate)
-    wiggle_strength: f32, // default: 8 (quality vs performance)
-    wiggle_speed: f32, // default: 8 (quality vs performance)
+    bottom_color: vec4<f32>, 
+    alpha: f32, 
+    density: f32, 
+    sharpness: f32, 
+    num_samples: i32, 
+    start_height: f32, 
+    end_height: f32, 
+    flow_scale: f32, 
+    flow_strength: f32, 
+    flow_speed: f32, 
+    wiggle_scale: f32,
+    wiggle_strength: f32,
+    wiggle_speed: f32,
     color_top: vec4<f32>,
     undersparkle_color_primary: vec4f,
     undersparkle_color_secondary: vec4f,
