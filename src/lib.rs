@@ -1,4 +1,5 @@
 pub mod assets;
+pub mod aurora;
 pub mod aurora_material;
 pub mod bind_groups;
 pub mod noise;

@@ -4,6 +4,8 @@ use bevy::{
     prelude::*,
     render::render_resource::{Extent3d, TextureDimension},
 };
+
+use crate::{aurora_material::AuroraMaterial, sky_material::FullSkyMaterial};
 // we will bake noise funcitons into textures for performance reasons
 // 3D textures for noise3d, and voronoi3d
 
@@ -13,24 +15,116 @@ pub struct NoiseHandles {
     pub voronoi3: Handle<Image>,
 }
 
-pub struct NoisePlugin;
+#[derive(Default)]
+pub struct NoisePlugin {
+    noise_settings: NoiseSettings,
+}
 
 impl Plugin for NoisePlugin {
     fn build(&self, app: &mut App) {
+        app.insert_resource(self.noise_settings.clone());
         app.add_systems(PreStartup, setup_noise_texture);
+        app.add_systems(PostUpdate, update_noise_textures);
     }
 }
 
-const NOISE3D_TEXTURE_SIZE: usize = 64;
-const VORONOI3D_TEXTURE_SIZE: usize = 64;
+///! texture_size data chart:
+///! 64x64x64 = 0.25 mb
+///! 128x128x128 = 2 mb
+///! 256x256x256 = 16 mb
+///! 514x514x514 = 129 mb
+#[derive(Resource, Reflect, Clone)]
+pub struct NoiseSettings {
+    ///! size of 3d noise texture
+    pub noise_texture_size: u32,
+    ///! size of 3d noise texture
+    pub voronoi_texture_size: u32,
+}
 
-fn setup_noise_texture(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
-    let noise3_data = generate_noise3(NOISE3D_TEXTURE_SIZE);
+impl Default for NoiseSettings {
+    fn default() -> Self {
+        Self {
+            noise_texture_size: 64,
+            // stars looks much rounder 128, than 64
+            voronoi_texture_size: 128,
+        }
+    }
+}
+
+pub fn update_noise_textures(
+    mut images: ResMut<Assets<Image>>,
+    noise_settings: Res<NoiseSettings>,
+    noise_handles: Res<NoiseHandles>,
+    mut sky_handles: Query<&mut MeshMaterial3d<FullSkyMaterial>>,
+    mut sky_materials: ResMut<Assets<FullSkyMaterial>>,
+    mut aurora_handles: Query<&mut MeshMaterial3d<AuroraMaterial>>,
+    mut aurora_materials: ResMut<Assets<AuroraMaterial>>,
+    mut repeated_calls: Local<i32>,
+) {
+    if !noise_settings.is_changed() {
+        *repeated_calls = 0;
+        return;
+    }
+    *repeated_calls += 1;
+    if *repeated_calls > 10 {
+        warn!(
+            "noise textures, was resized every last:{} frames!",
+            *repeated_calls
+        );
+        warn!("make sure NoiseSettings doesn't mutate every frame");
+    }
+    if noise_settings.noise_texture_size > 514 || noise_settings.voronoi_texture_size > 514 {
+        error!("massive noise texture detected, not updating it...");
+        return;
+    }
+    let noise_size = noise_settings.noise_texture_size.max(1);
+    let voronoi_size = noise_settings.voronoi_texture_size.max(1);
+    for sky_handle in sky_handles.iter_mut() {
+        if let Some(sky_material) = sky_materials.get_mut(&sky_handle.0) {
+            sky_material.noise3_texture_size = noise_size as f32;
+            sky_material.voronoi3_texture_size = voronoi_size as f32;
+        }
+    }
+    for aurora_handle in aurora_handles.iter_mut() {
+        if let Some(aurora_material) = aurora_materials.get_mut(&aurora_handle.0) {
+            aurora_material.noise3_texture_size = noise_size as f32;
+        }
+    }
+    // update full sky material
+    if let Some(noise3_image) = images.get_mut(&noise_handles.noise3) {
+        noise3_image.resize(Extent3d {
+            width: noise_size,
+            height: noise_size,
+            depth_or_array_layers: noise_size,
+        });
+        let noise3_data = generate_noise3(noise_size as usize);
+        noise3_image.data = Some(noise3_data);
+        info!("set noise texture size: {:?}", noise_size);
+    }
+
+    if let Some(voronoi3_image) = images.get_mut(&noise_handles.voronoi3) {
+        voronoi3_image.resize(Extent3d {
+            width: voronoi_size,
+            height: voronoi_size,
+            depth_or_array_layers: voronoi_size,
+        });
+        let voronoi3_data = generate_voronoi3(voronoi_size as usize);
+        voronoi3_image.data = Some(voronoi3_data);
+        info!("set voronoi texture size: {:?}", voronoi_size);
+    }
+}
+
+pub fn setup_noise_texture(
+    mut commands: Commands,
+    mut images: ResMut<Assets<Image>>,
+    noise_settings: Res<NoiseSettings>,
+) {
+    let noise3_data = generate_noise3(noise_settings.noise_texture_size as usize);
     let mut noise3_image = Image::new(
         Extent3d {
-            width: NOISE3D_TEXTURE_SIZE as u32,
-            height: NOISE3D_TEXTURE_SIZE as u32,
-            depth_or_array_layers: NOISE3D_TEXTURE_SIZE as u32,
+            width: noise_settings.noise_texture_size,
+            height: noise_settings.noise_texture_size,
+            depth_or_array_layers: noise_settings.noise_texture_size,
         },
         TextureDimension::D3,
         noise3_data,
@@ -40,12 +134,12 @@ fn setup_noise_texture(mut commands: Commands, mut images: ResMut<Assets<Image>>
     noise3_image.sampler = make_noise_sampler();
     let noise3_handle = images.add(noise3_image);
 
-    let voronoi3_data = generate_voronoi3(VORONOI3D_TEXTURE_SIZE);
+    let voronoi3_data = generate_voronoi3(noise_settings.voronoi_texture_size as usize);
     let mut voronoi3_image = Image::new(
         Extent3d {
-            width: VORONOI3D_TEXTURE_SIZE as u32,
-            height: VORONOI3D_TEXTURE_SIZE as u32,
-            depth_or_array_layers: VORONOI3D_TEXTURE_SIZE as u32,
+            width: noise_settings.voronoi_texture_size,
+            height: noise_settings.voronoi_texture_size,
+            depth_or_array_layers: noise_settings.voronoi_texture_size,
         },
         TextureDimension::D3,
         voronoi3_data,

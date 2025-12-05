@@ -2,21 +2,24 @@ use bevy::{prelude::*, render::render_resource::ShaderType};
 
 #[derive(Clone, Debug, Reflect, ShaderType)]
 pub struct GradientSettings {
+    #[allow(dead_code)]
     pub color_stops: [Vec4; 4],
+    #[allow(dead_code)]
     pub positions: Vec4,
+    #[allow(dead_code)]
     pub num_stops: u32,
 }
 #[derive(Clone, Debug, Reflect, ShaderType)]
 pub struct StarsSettings {
     ///! how fast to rotate sky per sec in radians, recommended value around: 0.01
     pub sky_rotation_speed: f32,
-    pub sample_scale: f32,         // 0.9
-    pub star_threshold: f32,       // 0.9
-    pub star_threshold_blink: f32, // 0.01
-    pub blink_speed: f32,          // 10.0
-    pub mask_scale: f32,           // 1.0
-    pub mask_threshold: f32,       //
-    pub blink_variance_scale: f32, // 0.03
+    pub sample_scale: f32,
+    pub star_threshold: f32,
+    pub star_threshold_blink: f32,
+    pub blink_speed: f32,
+    pub mask_scale: f32,
+    pub mask_threshold: f32,
+    pub blink_variance_scale: f32,
 }
 
 #[derive(Clone, Debug, Reflect, ShaderType)]
@@ -30,19 +33,18 @@ pub struct SunSettings {
 #[derive(Clone, Debug, Reflect, ShaderType)]
 pub struct AuroraSettings {
     pub color_bottom: LinearRgba,
-    pub alpha: f32,   // default: 1.0
-    pub density: f32, // default: 3.0
-    // pub aurora_wave_count: f32,            // default: 6.0
-    pub sharpness: f32,       // default: 4.0
-    pub num_samples: i32,     // default: 8 (quality vs performance)
-    pub start_height: f32,    // default: 15.0
-    pub end_height: f32,      // default: 35.0
-    pub flow_scale: f32,      // default: 0.3 (controls how much bands rotate)
-    pub flow_strength: f32,   // default: 8 (quality vs performance)
-    pub flow_speed: f32,      // default: 8 (quality vs performance)
-    pub wiggle_scale: f32,    // default: 0.3 (controls how much bands rotate)
-    pub wiggle_strength: f32, // default: 8 (quality vs performance)
-    pub wiggle_speed: f32,    // default: 8 (quality vs performance)
+    pub alpha: f32,
+    pub density: f32,
+    pub sharpness: f32,
+    pub num_samples: i32,
+    pub start_height: f32,
+    pub end_height: f32,
+    pub flow_scale: f32,
+    pub flow_strength: f32,
+    pub flow_speed: f32,
+    pub wiggle_scale: f32,
+    pub wiggle_strength: f32,
+    pub wiggle_speed: f32,
     pub color_top: LinearRgba,
     pub undersparkle_color_primary: LinearRgba,
     pub undersparkle_color_secondary: LinearRgba,
@@ -50,4 +52,5 @@ pub struct AuroraSettings {
     pub undersparkle_speed: f32,
     pub undersparkle_threshold: f32,
     pub undersparkle_height: f32,
+    pub opacity_per_sample: f32,
 }

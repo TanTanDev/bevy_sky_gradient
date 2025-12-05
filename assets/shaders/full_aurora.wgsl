@@ -11,14 +11,11 @@
 var<uniform> aurora_settings: AuroraSettings;
 
 @group(2) @binding(1)
-var noise3_texture: texture_3d<f32>;
+var<uniform> noise3_scale: f32;
 @group(2) @binding(2)
-var noise3_texture_sampler: sampler;
-
+var noise3_texture: texture_3d<f32>;
 @group(2) @binding(3)
-var voronoi3_texture: texture_3d<f32>;
-@group(2) @binding(4)
-var voronoi3_texture_sampler: sampler;
+var noise3_texture_sampler: sampler;
 
 struct VertexOutput {
     @builtin(position) clip_position: vec4<f32>,
@@ -38,7 +35,13 @@ fn vertex(@location(0) position: vec3<f32>, @builtin(instance_index) vertin: u32
 @fragment
 fn fragment(in: VertexOutput) -> @location(0) vec4<f32> {
     let view_dir = normalize(in.world_dir);
-    let north = aurora(view_dir, aurora_settings, globals.time, noise3_texture, noise3_texture_sampler);
+    let north = aurora(view_dir,
+        aurora_settings,
+        globals.time,
+        noise3_texture,
+        noise3_texture_sampler,
+        noise3_scale
+    );
     return north;
 }
 

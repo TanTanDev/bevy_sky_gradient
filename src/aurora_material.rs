@@ -7,13 +7,12 @@ use crate::bind_groups::AuroraSettings;
 pub struct AuroraMaterial {
     #[uniform(0)]
     pub aurora_settings: crate::bind_groups::AuroraSettings,
+    #[uniform(1)]
+    pub noise3_texture_size: f32,
 
-    #[texture(1, dimension = "3d")]
-    #[sampler(2)]
+    #[texture(2, dimension = "3d")]
+    #[sampler(3)]
     pub noise3_image: Handle<Image>,
-    #[texture(3, dimension = "3d")]
-    #[sampler(4)]
-    pub voronoi3_image: Handle<Image>,
 }
 
 impl Material for AuroraMaterial {
@@ -63,9 +62,10 @@ impl Default for AuroraMaterial {
                 undersparkle_speed: 0.02,
                 undersparkle_threshold: 0.3,
                 undersparkle_height: 0.3,
+                opacity_per_sample: 0.18,
             },
             noise3_image: Handle::default(),
-            voronoi3_image: Handle::default(),
+            noise3_texture_size: 64.0,
         }
     }
 }

@@ -21,6 +21,12 @@ var<uniform> night_time_distance: f32;
 @group(2) @binding(4)
 var<uniform> night_visibility_range: vec2<f32>;
 
+// pass noise texture sizes to ensure same noise sampling regardless of texture size
+@group(2) @binding(5)
+var<uniform> noise3_texture_size: f32;
+@group(2) @binding(6)
+var<uniform> voronoi3_texture_size: f32;
+
 @group(2) @binding(10)
 var noise3_texture: texture_3d<f32>;
 @group(2) @binding(11)
@@ -58,7 +64,14 @@ fn fragment(
 
     let base_color = gradient(view_dir, gradient_settings);
     let sun_color = sun(view_dir, sun_settings);
-    let star = stars(view_dir, stars_settings, globals.time, noise3_texture, noise3_texture_sampler, voronoi3_texture, voronoi3_texture_sampler);
+    let star = stars(view_dir,
+        stars_settings,
+        globals.time,
+        noise3_texture,
+        noise3_texture_sampler,
+        voronoi3_texture,
+        voronoi3_texture_sampler,
+    );
 
     // aurora
     let screen_uv = in.frag_pos.xy / view.viewport.zw;

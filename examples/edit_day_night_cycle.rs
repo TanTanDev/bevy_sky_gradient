@@ -1,8 +1,10 @@
 use bevy::{prelude::*, render::view::RenderLayers};
 use bevy_flycam::{FlyCam, NoCameraPlayerPlugin};
 use bevy_sky_gradient::{
+    aurora::AuroraSettings,
     aurora_material::AuroraMaterial,
     cycle::{SkyColors, SkyCyclePlugin, SkyTime, SunDriverPlugin, SunDriverTag, SunSettings},
+    noise::NoiseSettings,
     plugin::SkyGradientPlugin,
     sky_material::FullSkyMaterial,
 };
@@ -14,7 +16,7 @@ use bevy_inspector_egui::{
     },
     bevy_inspector::ui_for_resource,
     egui,
-    quick::{AssetInspectorPlugin, WorldInspectorPlugin},
+    quick::{AssetInspectorPlugin, ResourceInspectorPlugin, WorldInspectorPlugin},
 };
 use egui_colorgradient::gradient_editor;
 
@@ -27,6 +29,8 @@ fn main() {
         .add_plugins(WorldInspectorPlugin::new())
         .add_plugins(AssetInspectorPlugin::<FullSkyMaterial>::default())
         .add_plugins(AssetInspectorPlugin::<AuroraMaterial>::default())
+        .add_plugins(ResourceInspectorPlugin::<AuroraSettings>::default())
+        .add_plugins(ResourceInspectorPlugin::<NoiseSettings>::default())
         // camera
         .add_plugins(NoCameraPlayerPlugin)
         // SKY PLUGINS

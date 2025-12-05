@@ -2,15 +2,11 @@ use bevy::{
     asset::RenderAssetUsages,
     image::ImageSampler,
     prelude::*,
-    render::{
-        render_resource::{Extent3d, TextureDimension, TextureFormat, TextureUsages},
-        view::RenderLayers,
-    },
-    window::WindowResized,
+    render::render_resource::{Extent3d, TextureDimension, TextureFormat, TextureUsages},
 };
 
 use crate::{
-    aurora_material::AuroraMaterial,
+    aurora::{AuroraPlugin, AuroraSettings},
     noise::{NoiseHandles, NoisePlugin},
     sky_material::FullSkyMaterial,
     utils,
@@ -24,23 +20,24 @@ pub struct SkyGradientPlugin {
 
 impl Plugin for SkyGradientPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(NoisePlugin);
+        app.add_plugins(NoisePlugin::default());
+        app.add_plugins(AuroraPlugin {
+            aurora_settings: AuroraSettings::default(),
+        });
+
+        app.insert_resource(AuroraTextureHandle {
+            render_target: Handle::default(),
+        });
+        app.add_systems(PreStartup, spawn_aurora_texture);
 
         app.add_systems(Startup, crate::assets::initialize_shaders);
         app.add_plugins(MaterialPlugin::<FullSkyMaterial>::default());
-        app.add_plugins(MaterialPlugin::<AuroraMaterial>::default());
-        app.add_systems(PreStartup, spawn_aurora_skybox);
         if self.spawn_default_skybox {
             app.add_systems(Startup, spawn_default_skybox);
         }
         app.add_systems(
             PostUpdate,
-            (
-                sky_follow_camera,
-                aurora_follow_camera,
-                resize_aurora_on_window_change,
-            )
-                .before(TransformSystem::TransformPropagate),
+            (sky_follow_camera,).before(TransformSystem::TransformPropagate),
         );
     }
 }
@@ -58,7 +55,7 @@ fn spawn_default_skybox(
     mut meshes: ResMut<Assets<Mesh>>,
     mut sky_materials: ResMut<Assets<FullSkyMaterial>>,
     noise_handles: Res<NoiseHandles>,
-    aurora_handles: Res<AuroraHandles>,
+    aurora_handles: Res<AuroraTextureHandle>,
 ) {
     commands.spawn((
         Name::new("sky_gradient_skybox"),
@@ -72,45 +69,23 @@ fn spawn_default_skybox(
     ));
 }
 
-#[derive(Component)]
-pub struct AuroraCameraTag;
-
+// aurora texture is defined by sky, and the aurora render into it. it needs to be defined by the sky plugin
 #[derive(Resource)]
-pub struct AuroraHandles {
-    render_target: Handle<Image>,
+pub struct AuroraTextureHandle {
+    pub render_target: Handle<Image>,
 }
 
-fn spawn_aurora_skybox(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
+// spawn the aurora target texture, if not used, it's just a blank 2x2 texture
+pub fn spawn_aurora_texture(
     mut images: ResMut<Assets<Image>>,
-    mut sky_materials: ResMut<Assets<AuroraMaterial>>,
-    noise_handles: Res<NoiseHandles>,
+    mut aurora_texture_handle: ResMut<AuroraTextureHandle>,
 ) {
-    let first_pass_layer = RenderLayers::layer(7);
-    commands.spawn((
-        Name::new("sky_aurora_skybox"),
-        Mesh3d(meshes.add(utils::default_sky_mesh())),
-        Transform::from_xyz(0.0, 0.0, 0.0),
-        MeshMaterial3d(sky_materials.add(AuroraMaterial {
-            noise3_image: noise_handles.noise3.clone(),
-            voronoi3_image: noise_handles.voronoi3.clone(),
-            ..default()
-        })),
-        first_pass_layer.clone(),
-    ));
-
     let size = Extent3d {
-        width: 256,
-        height: 256,
-        // width: 512,
-        // height: 512,
-        // width: 1920,
-        // height: 1080,
+        width: 2,
+        height: 2,
         ..default()
     };
 
-    // This is the texture that will be rendered to.
     let mut aurora_image = Image::new_fill(
         size,
         TextureDimension::D2,
@@ -123,25 +98,7 @@ fn spawn_aurora_skybox(
         TextureUsages::TEXTURE_BINDING | TextureUsages::COPY_DST | TextureUsages::RENDER_ATTACHMENT;
 
     let aurora_image_handle = images.add(aurora_image);
-    // AURORA CAMERA
-    commands.spawn((
-        Name::new("camera_aurora"),
-        Camera3d::default(),
-        AuroraCameraTag,
-        Camera {
-            // render aurora before the "main pass" camera
-            order: -1,
-            target: aurora_image_handle.clone().into(),
-            clear_color: ClearColorConfig::Custom(Color::NONE),
-            ..default()
-        },
-        Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)).looking_at(Vec3::ZERO, Vec3::Y),
-        first_pass_layer,
-    ));
-    commands.insert_resource(AuroraHandles {
-        render_target: aurora_image_handle.clone(),
-    });
-    // commands.spawn((ImageNode::new(aurora_image_handle.clone())));
+    aurora_texture_handle.render_target = aurora_image_handle;
 }
 
 fn sky_follow_camera(
@@ -155,47 +112,6 @@ fn sky_follow_camera(
     {
         for mut tf in &mut sky_query {
             tf.translation = cam_tf.translation;
-        }
-    }
-}
-
-fn aurora_follow_camera(
-    primary_cameras: Query<(&Transform, &Camera), Without<AuroraCameraTag>>,
-    mut aurora_cameras: Query<(&mut Transform, &Camera), With<AuroraCameraTag>>,
-    mut aurora_mesh: Query<&mut Transform, (Without<Camera>, With<MeshMaterial3d<AuroraMaterial>>)>,
-) {
-    // find active camera TODO: IDENTIFY THE CORRECT CAMERA BETTER
-    for (cam_tf, _camera) in primary_cameras
-        .iter()
-        .filter(|cam| cam.1.is_active && cam.1.order == 0)
-    {
-        for (mut aurora_tf, _came) in aurora_cameras.iter_mut() {
-            // aurora_tf.translation = cam_tf.translation;
-            *aurora_tf = *cam_tf;
-            for mut aurora_tf in aurora_mesh.iter_mut() {
-                aurora_tf.translation = cam_tf.translation;
-            }
-        }
-    }
-}
-
-fn resize_aurora_on_window_change(
-    mut resize_events: EventReader<WindowResized>,
-    mut images: ResMut<Assets<Image>>,
-    aurora_handles: Res<AuroraHandles>,
-) {
-    for event in resize_events.read() {
-        let aspect = event.width / event.height;
-        // let width = 256;
-        let width = 514;
-        let height = (width as f32 / aspect) as u32;
-
-        if let Some(image) = images.get_mut(&aurora_handles.render_target) {
-            image.resize(Extent3d {
-                width,
-                height,
-                depth_or_array_layers: 1,
-            });
         }
     }
 }
