@@ -10,6 +10,13 @@ pub struct GradientSettings {
 pub struct StarsSettings {
     ///! how fast to rotate sky per sec in radians, recommended value around: 0.01
     pub sky_rotation_speed: f32,
+    pub sample_scale: f32,         // 0.9
+    pub star_threshold: f32,       // 0.9
+    pub star_threshold_blink: f32, // 0.01
+    pub blink_speed: f32,          // 10.0
+    pub mask_scale: f32,           // 1.0
+    pub mask_threshold: f32,       //
+    pub blink_variance_scale: f32, // 0.03
 }
 
 #[derive(Clone, Debug, Reflect, ShaderType)]

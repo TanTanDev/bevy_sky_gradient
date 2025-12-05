@@ -84,6 +84,13 @@ impl Default for FullSkyMaterial {
             night_visibility_range: vec2(0.0, 0.1),
             stars: StarsSettings {
                 sky_rotation_speed: 0.01,
+                sample_scale: 9.0,
+                mask_scale: 1.0,
+                blink_variance_scale: 0.03,
+                mask_threshold: 0.4,
+                star_threshold: 0.9,
+                star_threshold_blink: 0.01,
+                blink_speed: 10.0,
             },
             noise3_image: Handle::default(),
             voronoi3_image: Handle::default(),

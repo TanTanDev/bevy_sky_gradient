@@ -2,6 +2,15 @@
 
 struct StarsSettings {
     sky_rotation_speed: f32,
+    sample_scale: f32,
+
+    star_threshold: f32, // 0.9
+    star_threshold_blink: f32, // 0.01
+    blink_speed: f32, // 10.0
+
+    mask_scale: f32, // 1.0
+    mask_threshold: f32, // 1.0
+    blink_variance_scale: f32, // 0.1
 }
 
 fn stars(
@@ -24,24 +33,20 @@ fn stars(
     );
     let offset_world_dir = rotation_matrix * view_dir;
 
-    var noise = 1.0-noise(v3_t, v3_s,offset_world_dir*9.0);
-    let mask = noise(n3_t, n3_s, offset_world_dir);
-    let variance_noise = noise(n3_t, n3_s, offset_world_dir*0.1);
+    var noise = 1.0-noise(v3_t, v3_s,offset_world_dir*stars.sample_scale);
+    let mask = noise(n3_t, n3_s, offset_world_dir * stars.mask_scale);
+    let blink_variance_noise = noise(n3_t, n3_s, offset_world_dir*stars.blink_variance_scale);
 
     // reduce star density with mask
-    noise = noise * (1.0-pow(mask, 6.0));
+    noise = noise * (1.0-smoothstep(stars.mask_threshold, 1.0, mask));
 
-    let blink_speed = global_time * 10.0;
-    // star blink in different speeds
-    let speed_variance = (1.0 + sin(variance_noise * 1.3)*0.50);
-    // stars should not blink the same time
-    let blink_offset = variance_noise * 0.1;
+    let base_blink_speed = global_time * stars.blink_speed;
+    // star blink in different speeds anywhere between 50% -> 150%
+    let speed_variance = (1.0 + sin(blink_variance_noise) * 0.5);
     // 0: no blink, 1: full blink
-    let blink = cos(blink_speed*speed_variance+blink_offset);
-    // how large the blink is visually
-    let blink_strength = 0.01;
-    // reduce voroni to "dots" in range 0.93-1
-    var star_intensity = smoothstep(0.9+blink*blink_strength, 1.0, noise);
+    let blink = cos(base_blink_speed*speed_variance+blink_variance_noise);
+    let blink_threshold = blink * stars.star_threshold_blink;
+    var star_intensity = smoothstep(stars.star_threshold + blink_threshold, 1.0, noise);
     return star_intensity;
 }
 
