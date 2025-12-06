@@ -58,17 +58,18 @@ impl Plugin for AuroraPlugin {
 }
 
 fn aurora_follow_camera(
-    primary_cameras: Query<(&Transform, &Camera), Without<AuroraCameraTag>>,
-    mut aurora_cameras: Query<(&mut Transform, &Camera), With<AuroraCameraTag>>,
+    primary_cameras: Query<(&Transform, &Camera, &Projection), Without<AuroraCameraTag>>,
+    mut aurora_cameras: Query<(&mut Transform, &Camera, &mut Projection), With<AuroraCameraTag>>,
     mut aurora_mesh: Query<&mut Transform, (Without<Camera>, With<MeshMaterial3d<AuroraMaterial>>)>,
 ) {
     // find active camera TODO: IDENTIFY THE CORRECT CAMERA BETTER
-    for (cam_tf, _camera) in primary_cameras
+    for (cam_tf, _camera, cam_proj) in primary_cameras
         .iter()
         .filter(|cam| cam.1.is_active && cam.1.order == 0)
     {
-        for (mut aurora_tf, _came) in aurora_cameras.iter_mut() {
-            // aurora_tf.translation = cam_tf.translation;
+        for (mut aurora_tf, _cam, mut aurora_projection) in aurora_cameras.iter_mut() {
+            // ensure same projection
+            *aurora_projection = cam_proj.clone();
             *aurora_tf = *cam_tf;
             for mut aurora_tf in aurora_mesh.iter_mut() {
                 aurora_tf.translation = cam_tf.translation;
