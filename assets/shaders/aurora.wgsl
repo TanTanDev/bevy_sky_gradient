@@ -40,7 +40,6 @@ fn aurora(
     global_time: f32,
     n3_t: texture_3d<f32>,
     n3_s: sampler,
-    n3_scale: f32
 ) -> vec4<f32> {
     // Ensure at least 2 samples
     let samples = max(settings.num_samples, 2);

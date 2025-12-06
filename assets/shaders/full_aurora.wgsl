@@ -38,7 +38,6 @@ fn fragment(in: VertexOutput) -> @location(0) vec4<f32> {
         globals.time,
         noise3_texture,
         noise3_texture_sampler,
-        noise3_scale
     );
     return north;
 }
