@@ -3,10 +3,12 @@ use bevy_flycam::{FlyCam, NoCameraPlayerPlugin};
 use bevy_sky_gradient::{
     aurora::AuroraSettings,
     aurora_material::AuroraMaterial,
-    cycle::{SkyColors, SkyCyclePlugin, SkyTime, SunDriverPlugin, SunDriverTag, SunSettings},
+    cycle::{SkyCyclePlugin, SkyTime, SkyTimeSettings},
+    gradient::SkyColors,
     noise::NoiseSettings,
-    plugin::SkyGradientPlugin,
+    plugin::SkyPlugin,
     sky_material::FullSkyMaterial,
+    sun::{SunDriverTag, SunSettings},
 };
 
 use bevy_inspector_egui::{
@@ -26,19 +28,25 @@ fn main() {
         .add_plugins(DefaultPlugins)
         // egui
         .add_plugins(EguiPlugin::default())
-        .add_plugins(WorldInspectorPlugin::new())
+        // .add_plugins(WorldInspectorPlugin::new())
         .add_plugins(AssetInspectorPlugin::<FullSkyMaterial>::default())
         .add_plugins(AssetInspectorPlugin::<AuroraMaterial>::default())
         .add_plugins(ResourceInspectorPlugin::<AuroraSettings>::default())
         .add_plugins(ResourceInspectorPlugin::<NoiseSettings>::default())
+        .add_plugins(ResourceInspectorPlugin::<SkyTimeSettings>::default())
         // camera
         .add_plugins(NoCameraPlayerPlugin)
-        // SKY PLUGINS
-        .add_plugins(SkyGradientPlugin::default()) // spawns skybox
-        .add_plugins(SkyCyclePlugin::default()) // drives skybox colors in cycles
-        .add_plugins(SunDriverPlugin::default()) // spawns sun
+        // SKY plugin
+        .add_plugins(
+            SkyPlugin::builder_all_features()
+                .with_noise_settings(NoiseSettings {
+                    noise_texture_size: 128,
+                    voronoi_texture_size: 128,
+                })
+                .build(),
+        )
         .add_systems(EguiPrimaryContextPass, edit_ui)
-        .add_systems(Startup, setup)
+        .add_systems(Startup, (setup, setup_egui_render_layer))
         .run();
 }
 
@@ -46,9 +54,7 @@ fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    mut egui_global_settings: ResMut<EguiGlobalSettings>,
 ) {
-    egui_global_settings.auto_create_primary_context = false;
     // spawn a flat circular base.
     commands.spawn((
         Mesh3d(meshes.add(Circle::new(3.0))),
@@ -62,17 +68,6 @@ fn setup(
         Camera3d::default(),
         Transform::from_xyz(-0.4, 0.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
         FlyCam,
-    ));
-
-    // egui
-    commands.spawn((
-        PrimaryEguiContext,
-        Camera3d::default(),
-        Camera {
-            order: 1,
-            ..default()
-        },
-        RenderLayers::none(),
     ));
 }
 
@@ -118,4 +113,23 @@ fn edit_ui(mut world: &mut World) {
             ui_for_resource::<AmbientLight>(world, ui);
         });
     });
+}
+
+// egui by default renders into the first camera it finds.
+// which happends to be our AuroraCamera lmao.
+// this ensures egui doesn't render onto our aurora. disable for some fun :)
+fn setup_egui_render_layer(
+    mut commands: Commands,
+    mut egui_global_settings: ResMut<EguiGlobalSettings>,
+) {
+    egui_global_settings.auto_create_primary_context = false;
+    commands.spawn((
+        PrimaryEguiContext,
+        Camera3d::default(),
+        Camera {
+            order: 1,
+            ..default()
+        },
+        RenderLayers::none(),
+    ));
 }

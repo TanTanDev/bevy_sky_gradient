@@ -1,59 +1,62 @@
 use bevy::{color::palettes::css::WHITE, pbr::light_consts::lux::AMBIENT_DAYLIGHT, prelude::*};
 use bevy_flycam::{FlyCam, NoCameraPlayerPlugin};
+use bevy_inspector_egui::egui::Color32;
 use bevy_sky_gradient::{
-    cycle::{
-        SkyColorsBuilder, SkyCyclePlugin, SkyTimeSettings, StopsColors, SunDriverPlugin,
-        SunDriverTag, SunSettings,
-    },
-    plugin::SkyGradientPlugin,
+    cycle::{SkyCyclePlugin, SkyTimeSettings},
+    gradient::{GradientDriverPlugin, SkyColorsBuilder, StopsColors},
+    noise::NoiseHandles,
+    plugin::{AuroraTextureHandle, SkyPlugin},
     sky_material::FullSkyMaterial,
+    sun::{SunDriverPlugin, SunDriverTag, SunSettings},
 };
 
-use bevy_inspector_egui::{bevy_egui::EguiPlugin, egui::Color32, quick::AssetInspectorPlugin};
-
-// This example show the customization of the Cycle
-// here we manually spawn: SKYBOX, and our sun light
+// This example show how you can customize in depth
+// here we manually spawn: skybox, and our sun light
+// we also configure the cycle timings (long night)
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        // egui
-        .add_plugins(EguiPlugin::default())
-        .add_plugins(AssetInspectorPlugin::<FullSkyMaterial>::default())
-        // camera
         .add_plugins(NoCameraPlayerPlugin)
-        // sky plugins
-        .add_plugins(SkyGradientPlugin {
-            spawn_default_skybox: false,
-        })
-        .add_plugins(SkyCyclePlugin {
-            sky_time_settings: SkyTimeSettings {
-                day_time_sec: 10.0,
-                night_time_sec: 20.0,
-                sunrise_time_sec: 2.0,
-                sunset_time_sec: 2.0,
-            },
-            // THIS WILL CREATE A SOLID COLOR, because the stops are the same
-            // except for the day high, which we make very wonky
-            sky_colors_builder: SkyColorsBuilder {
-                sunset_color: StopsColors::new_splat(Color32::RED),
-                sunrise_color: StopsColors::new_splat(Color32::RED),
-                day_low_color: StopsColors::new_splat(Color32::LIGHT_BLUE),
-                day_high_color: StopsColors {
-                    stop0: Color32::from_rgb(0, 255, 0),
-                    stop1: Color32::from_rgb(255, 0, 0),
-                    stop2: Color32::from_rgb(0, 0, 255),
-                    stop3: Color32::from_rgb(0, 255, 255),
-                },
-                night_low_color: StopsColors::new_splat(Color32::DARK_BLUE),
-                night_high_color: StopsColors::new_splat(Color32::BLACK),
-            },
-        })
-        .add_plugins(SunDriverPlugin {
-            spawn_default_sun: false,
-            sun_settings: SunSettings {
-                illuminance: AMBIENT_DAYLIGHT,
-            },
-        })
+        // SKY
+        .add_plugins(
+            SkyPlugin::builder_all_features()
+                .set_spawn_default_skybox(false)
+                .set_cycle(SkyCyclePlugin {
+                    sky_time_settings: SkyTimeSettings {
+                        day_time_sec: 3.0,
+                        night_time_sec: 3.0,
+                        sunrise_time_sec: 0.2,
+                        sunset_time_sec: 0.2,
+                    },
+                })
+                .set_sun_driver(SunDriverPlugin {
+                    spawn_default_sun_light: false,
+                    sun_settings: SunSettings {
+                        illuminance: 10000.0,
+                        sun_color: vec4(1.0, 1.0, 0.0, 1.0),
+                        sun_strength: default(),
+                        sun_sharpness: default(),
+                    },
+                })
+                // THIS WILL CREATE A SOLID COLOR, because the stops are the same
+                // except for the day high, which we make very wonky
+                .set_gradient_driver(GradientDriverPlugin {
+                    sky_colors_builder: SkyColorsBuilder {
+                        sunset_color: StopsColors::new_splat(Color32::RED),
+                        sunrise_color: StopsColors::new_splat(Color32::RED),
+                        day_low_color: StopsColors::new_splat(Color32::LIGHT_BLUE),
+                        day_high_color: StopsColors {
+                            stop0: Color32::from_rgb(0, 255, 0),
+                            stop1: Color32::from_rgb(255, 0, 0),
+                            stop2: Color32::from_rgb(0, 0, 255),
+                            stop3: Color32::from_rgb(0, 255, 255),
+                        },
+                        night_low_color: StopsColors::new_splat(Color32::DARK_BLUE),
+                        night_high_color: StopsColors::new_splat(Color32::BLACK),
+                    },
+                })
+                .build(),
+        )
         .add_systems(Startup, setup)
         .run();
 }
@@ -63,18 +66,26 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut sky_materials: ResMut<Assets<FullSkyMaterial>>,
+    noise_handles: Res<NoiseHandles>,
+    aurora_handle: Res<AuroraTextureHandle>,
 ) {
-    // MANUAL SKYBOX CREATION, using a cuboid mesh instead of Sphere
+    // MANUAL SKYBOX CREATION, using a cuboid mesh instead of Sphere, because we can.
     let mut mesh = Cuboid::from_length(1.0).mesh().build();
     bevy_sky_gradient::utils::flip_mesh_normals(&mut mesh);
     commands.spawn((
         Mesh3d(meshes.add(mesh)),
-        MeshMaterial3d(sky_materials.add(FullSkyMaterial::default())),
+        // if you manually create the sky mesh...
+        // you still need valid texture handles, so we can fetch that.
+        MeshMaterial3d(sky_materials.add(FullSkyMaterial {
+            noise3_image: noise_handles.noise3.clone(),
+            voronoi3_image: noise_handles.voronoi3.clone(),
+            aurora_image: aurora_handle.render_target.clone(),
+            ..default()
+        })),
     ));
 
     // MANUAL SUN LIGHT SOURCE creation
     commands.spawn((
-        // The driver tag is required
         SunDriverTag,
         DirectionalLight {
             color: WHITE.into(),

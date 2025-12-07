@@ -15,9 +15,9 @@ pub struct NoiseHandles {
     pub voronoi3: Handle<Image>,
 }
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct NoisePlugin {
-    noise_settings: NoiseSettings,
+    pub noise_settings: NoiseSettings,
 }
 
 impl Plugin for NoisePlugin {
@@ -77,12 +77,6 @@ pub fn update_noise_textures(
     }
     let noise_size = noise_settings.noise_texture_size.max(1);
     let voronoi_size = noise_settings.voronoi_texture_size.max(1);
-    for sky_handle in sky_handles.iter_mut() {
-        if let Some(sky_material) = sky_materials.get_mut(&sky_handle.0) {
-            sky_material.noise3_texture_size = noise_size as f32;
-            sky_material.voronoi3_texture_size = voronoi_size as f32;
-        }
-    }
     // update full sky material
     if let Some(noise3_image) = images.get_mut(&noise_handles.noise3) {
         noise3_image.resize(Extent3d {

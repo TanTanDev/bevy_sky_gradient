@@ -1,6 +1,6 @@
 use bevy_inspector_egui::egui::Color32;
 
-use crate::cycle::{SkyColorsBuilder, StopsColors};
+use crate::gradient::{SkyColorsBuilder, StopsColors};
 
 pub const DEFAULT_SKY_COLORS_BUILDER: SkyColorsBuilder = SkyColorsBuilder {
     sunset_color: StopsColors {

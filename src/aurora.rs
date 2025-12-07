@@ -25,18 +25,29 @@ pub struct AuroraSettings {
     ///! a value of 1.0: use 100% of the windows screen size. aka full quality.
     ///! a value of 0.5: will render the aurora 50% of the screen and be upscaled 200%
     pub render_texture_percent: f32,
+    ///! what render layer the aurora will render on
+    pub camera_render_layers: RenderLayers,
 }
 
 impl Default for AuroraSettings {
     fn default() -> Self {
         Self {
             render_texture_percent: 0.33,
+            camera_render_layers: RenderLayers::layer(7),
         }
     }
 }
 
+#[derive(Clone)]
 pub struct AuroraPlugin {
     pub aurora_settings: AuroraSettings,
+}
+impl Default for AuroraPlugin {
+    fn default() -> Self {
+        Self {
+            aurora_settings: Default::default(),
+        }
+    }
 }
 
 impl Plugin for AuroraPlugin {
@@ -131,8 +142,8 @@ fn spawn_aurora_skybox(
     mut sky_materials: ResMut<Assets<AuroraMaterial>>,
     noise_handles: Res<NoiseHandles>,
     aurora_texture_handle: Res<AuroraTextureHandle>,
+    aurora_settings: Res<AuroraSettings>,
 ) {
-    let first_pass_layer = RenderLayers::layer(7);
     commands.spawn((
         Name::new("sky_aurora_skybox"),
         Mesh3d(meshes.add(utils::default_sky_mesh())),
@@ -141,7 +152,7 @@ fn spawn_aurora_skybox(
             noise3_image: noise_handles.noise3.clone(),
             ..default()
         })),
-        first_pass_layer.clone(),
+        aurora_settings.camera_render_layers.clone(),
     ));
 
     // AURORA CAMERA
@@ -157,6 +168,6 @@ fn spawn_aurora_skybox(
             ..default()
         },
         Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)).looking_at(Vec3::ZERO, Vec3::Y),
-        first_pass_layer,
+        aurora_settings.camera_render_layers.clone(),
     ));
 }

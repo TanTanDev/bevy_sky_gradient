@@ -23,10 +23,13 @@ pub struct FullSkyMaterial {
     ///! 0.1: sky brightness is maxed out 10% into the night
     #[uniform(4)]
     pub night_visibility_range: Vec2,
+
     #[uniform(5)]
-    pub noise3_texture_size: f32,
+    pub feature_stars_enabled: i32,
     #[uniform(6)]
-    pub voronoi3_texture_size: f32,
+    pub feature_sun_enabled: i32,
+    #[uniform(7)]
+    pub feature_aurora_enabled: i32,
 
     // noise
     #[texture(10, dimension = "3d")]
@@ -99,8 +102,9 @@ impl Default for FullSkyMaterial {
             noise3_image: Handle::default(),
             voronoi3_image: Handle::default(),
             aurora_image: Handle::default(),
-            noise3_texture_size: 64.0,
-            voronoi3_texture_size: 64.0,
+            feature_stars_enabled: 1,
+            feature_sun_enabled: 1,
+            feature_aurora_enabled: 1,
         }
     }
 }

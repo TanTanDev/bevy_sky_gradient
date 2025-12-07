@@ -2,16 +2,16 @@ use bevy::{prelude::*, render::render_resource::ShaderType};
 
 #[derive(Clone, Debug, Reflect, ShaderType)]
 pub struct GradientSettings {
-    #[allow(dead_code)]
+    ///! the colors of sky
     pub color_stops: [Vec4; 4],
-    #[allow(dead_code)]
+    ///! where the color gradients are positioned
     pub positions: Vec4,
-    #[allow(dead_code)]
+    ///! how many sky colors to make gradient of (max 4)
     pub num_stops: u32,
 }
 #[derive(Clone, Debug, Reflect, ShaderType)]
 pub struct StarsSettings {
-    ///! how fast to rotate sky per sec in radians, recommended value around: 0.01
+    ///! how fast to rotate sky per sec in radians
     pub sky_rotation_speed: f32,
     pub sample_scale: f32,
     pub star_threshold: f32,
@@ -28,6 +28,17 @@ pub struct SunSettings {
     pub sun_color: Vec4,
     pub sun_strength: f32,
     pub sun_sharpness: f32,
+}
+
+impl Default for SunSettings {
+    fn default() -> Self {
+        Self {
+            sun_dir: Vec3::new(0.0, 0.1, -1.0),
+            sun_color: Vec4::new(1.0, 1.0, 0.5, 1.0),
+            sun_strength: 1.5,
+            sun_sharpness: 164.0,
+        }
+    }
 }
 
 #[derive(Clone, Debug, Reflect, ShaderType)]
