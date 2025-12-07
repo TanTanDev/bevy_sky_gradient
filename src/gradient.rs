@@ -34,7 +34,6 @@ fn update_sky_colors_builder(
     mut sky_colors: ResMut<SkyColors>,
     sky_colors_builder: Res<SkyColorsBuilder>,
 ) {
-    info!("updating sky colors from skytimesettings");
     *sky_colors = sky_colors_builder.build(&sky_time_settings);
 }
 
