@@ -1,10 +1,6 @@
-use std::f32::consts::PI;
+use bevy::prelude::*;
 
-use bevy::{color::palettes::css::WHITE, pbr::light_consts::lux::AMBIENT_DAYLIGHT, prelude::*};
-use bevy_inspector_egui::egui::Color32;
-use egui_colorgradient::{Gradient, InterpolationMethod};
-
-use crate::{gradient::GradientDriverPlugin, sky_material::FullSkyMaterial};
+use crate::sky_material::FullSkyMaterial;
 
 // cycle.rs has 2 plugins: SkyCyclePlugin and SunDriverPlugin
 
@@ -13,19 +9,21 @@ use crate::{gradient::GradientDriverPlugin, sky_material::FullSkyMaterial};
 #[derive(Clone)]
 pub struct SkyCyclePlugin {
     pub sky_time_settings: SkyTimeSettings,
+    pub sky_time: SkyTime,
 }
 
 impl Default for SkyCyclePlugin {
     fn default() -> Self {
         Self {
-            sky_time_settings: Default::default(),
+            sky_time_settings: SkyTimeSettings::default(),
+            sky_time: SkyTime::default(),
         }
     }
 }
 
 impl Plugin for SkyCyclePlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(SkyTime::default());
+        app.insert_resource(self.sky_time.clone());
         app.insert_resource(self.sky_time_settings.clone());
         app.add_systems(Update, (update_sky_time, drive_night_time).chain());
     }
@@ -62,7 +60,7 @@ fn drive_night_time(
 }
 
 ///! The current sky time
-#[derive(Resource, Reflect)]
+#[derive(Resource, Reflect, Clone)]
 pub struct SkyTime {
     pub time: f32,
     pub auto_tick: bool,

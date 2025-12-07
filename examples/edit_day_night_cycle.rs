@@ -43,6 +43,14 @@ fn main() {
                     noise_texture_size: 128,
                     voronoi_texture_size: 128,
                 })
+                .set_cycle(SkyCyclePlugin {
+                    sky_time_settings: SkyTimeSettings::default(),
+                    sky_time: SkyTime {
+                        // start by night because it looks lovely
+                        time: 14.0,
+                        auto_tick: true,
+                    },
+                })
                 .build(),
         )
         .add_systems(EguiPrimaryContextPass, edit_ui)

@@ -2,7 +2,7 @@ use bevy::{color::palettes::css::WHITE, pbr::light_consts::lux::AMBIENT_DAYLIGHT
 use bevy_flycam::{FlyCam, NoCameraPlayerPlugin};
 use bevy_inspector_egui::egui::Color32;
 use bevy_sky_gradient::{
-    cycle::{SkyCyclePlugin, SkyTimeSettings},
+    cycle::{SkyCyclePlugin, SkyTime, SkyTimeSettings},
     gradient::{GradientDriverPlugin, SkyColorsBuilder, StopsColors},
     noise::NoiseHandles,
     plugin::{AuroraTextureHandle, SkyPlugin},
@@ -28,6 +28,7 @@ fn main() {
                         sunrise_time_sec: 0.2,
                         sunset_time_sec: 0.2,
                     },
+                    sky_time: SkyTime::default(),
                 })
                 .set_sun_driver(SunDriverPlugin {
                     spawn_default_sun_light: false,
