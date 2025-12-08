@@ -47,13 +47,11 @@ pub struct NoiseSettings {
     pub noise_texture_size: u32,
     ///! size of 3d noise texture
     pub voronoi_texture_size: u32,
+    ///! if set, USERS may not exceed this size
+    pub noise_size_limit: Option<u32>,
 
     #[cfg(feature = "serde")]
     pub cache_textures_locally: bool,
-
-    ///! if set, USERS may not exceed this size
-    #[cfg(feature = "serde")]
-    pub noise_size_limit: Option<u32>,
 }
 
 impl Default for NoiseSettings {
@@ -265,6 +263,7 @@ fn make_noise_sampler() -> ImageSampler {
 }
 
 ///! will wait until a noisetextureasset is loaded, then override hte texture data
+#[cfg(feature = "serde")]
 #[derive(Resource)]
 pub struct PendingNoiseTextureAsset(Handle<NoiseTextureAsset>);
 
@@ -422,12 +421,14 @@ impl AssetLoader for NoiseTextureAssetLoader {
     }
 }
 
+#[cfg(feature = "serde")]
 fn path_relative_to_bevy_exe(path: &str) -> std::path::PathBuf {
     let current_dir = bevy::asset::io::file::FileAssetReader::get_base_path();
     let new_path = current_dir.join(path);
     new_path
 }
 
+#[cfg(feature = "serde")]
 pub fn save_noise(dir: &str, file_name: &str, asset: &NoiseTextureAsset) {
     let path = path_relative_to_bevy_exe(dir);
     if let Err(err) = std::fs::create_dir_all(&path) {
