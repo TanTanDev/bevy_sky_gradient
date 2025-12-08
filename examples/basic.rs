@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_flycam::{FlyCam, NoCameraPlayerPlugin};
-use bevy_sky_gradient::plugin::SkyPlugin;
+use bevy_sky_gradient::plugin::{SkyPlugin, SkyboxMagnetTag};
 
 fn main() {
     App::new()
@@ -31,6 +31,8 @@ fn setup(
 
     // camera
     commands.spawn((
+        // tell SkyPlugin we want the skybox centered on this camera
+        SkyboxMagnetTag,
         Camera3d::default(),
         Transform::from_xyz(-0.4, 0.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
         FlyCam,

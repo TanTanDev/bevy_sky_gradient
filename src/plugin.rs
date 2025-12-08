@@ -178,6 +178,10 @@ impl Default for SkyPlugin {
     }
 }
 
+///! attach to your main camera for the skybox to auto move to
+#[derive(Component)]
+pub struct SkyboxMagnetTag;
+
 fn spawn_default_skybox(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -187,6 +191,7 @@ fn spawn_default_skybox(
 ) {
     commands.spawn((
         Name::new("sky_gradient_skybox"),
+        SkyboxMagnetTag,
         Mesh3d(meshes.add(utils::default_sky_mesh())),
         MeshMaterial3d(sky_materials.add(FullSkyMaterial {
             noise3_image: noise_handles.noise3.clone(),
@@ -230,16 +235,26 @@ pub fn spawn_aurora_texture(
 }
 
 fn sky_follow_camera(
-    camera_query: Query<(&Transform, &Camera)>,
+    camera_query: Query<&Transform, (With<SkyboxMagnetTag>, With<Camera>)>,
     mut sky_query: Query<&mut Transform, (Without<Camera>, With<MeshMaterial3d<FullSkyMaterial>>)>,
+    mut warned_once: Local<bool>,
 ) {
-    // find active camera TODO: IDENTIFY THE CORRECT CAMERA BETTER
-    for (cam_tf, _camera) in camera_query
-        .iter()
-        .filter(|cam| cam.1.is_active && cam.1.order == 0)
-    {
-        for mut tf in &mut sky_query {
-            tf.translation = cam_tf.translation;
+    let mut count = 0;
+    for main_cam_transform in camera_query.iter() {
+        count += 1;
+        for mut sky_transform in &mut sky_query {
+            sky_transform.translation = main_cam_transform.translation;
+        }
+    }
+    if count == 0 {
+        if !*warned_once {
+            warn!("SkyPlugin: no camera with SkyBoxMagnetTag to transform to");
+            *warned_once = true;
+        }
+    } else if count > 1 {
+        if !*warned_once {
+            warn!("SkyPlugin: MORE THAN 1 CAMERA WITH SkyBoxMagnetTag");
+            *warned_once = true;
         }
     }
 }

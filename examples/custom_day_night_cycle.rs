@@ -5,7 +5,7 @@ use bevy_sky_gradient::{
     cycle::{SkyCyclePlugin, SkyTime, SkyTimeSettings},
     gradient::{GradientDriverPlugin, SkyColorsBuilder, StopsColors},
     noise::NoiseHandles,
-    plugin::{AuroraTextureHandle, SkyPlugin},
+    plugin::{AuroraTextureHandle, SkyPlugin, SkyboxMagnetTag},
     sky_material::FullSkyMaterial,
     sun::{SunDriverPlugin, SunDriverTag, SunSettings},
 };
@@ -106,6 +106,8 @@ fn setup(
 
     // camera
     commands.spawn((
+        // tell SkyPlugin we want the skybox centered on this camera
+        SkyboxMagnetTag,
         Camera3d::default(),
         Transform::from_xyz(-0.4, 0.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
         FlyCam,

@@ -6,7 +6,7 @@ use bevy_sky_gradient::{
     cycle::{SkyCyclePlugin, SkyTime, SkyTimeSettings},
     gradient::SkyColors,
     noise::NoiseSettings,
-    plugin::SkyPlugin,
+    plugin::{SkyPlugin, SkyboxMagnetTag},
     sky_material::FullSkyMaterial,
     sun::{SunDriverTag, SunSettings},
 };
@@ -18,7 +18,7 @@ use bevy_inspector_egui::{
     },
     bevy_inspector::ui_for_resource,
     egui,
-    quick::{AssetInspectorPlugin, ResourceInspectorPlugin, WorldInspectorPlugin},
+    quick::{AssetInspectorPlugin, ResourceInspectorPlugin},
 };
 use egui_colorgradient::gradient_editor;
 
@@ -74,6 +74,8 @@ fn setup(
     // camera
     commands.spawn((
         Camera3d::default(),
+        // tell SkyPlugin we want the skybox centered on this camera
+        SkyboxMagnetTag,
         Transform::from_xyz(-0.4, 0.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
         FlyCam,
     ));
