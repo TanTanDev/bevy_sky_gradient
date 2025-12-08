@@ -42,7 +42,15 @@ fn main() {
                 .with_noise_settings(NoiseSettings {
                     noise_texture_size: 128,
                     voronoi_texture_size: 128,
-                    noise_size_limit: Some(256), // prevent massive noise textures
+                    noise_size_limit: Some(256),
+                    // because this example showcase live tweaking...
+                    // I disable noise texture file cashing, because tweaking the noise size
+                    // would generate hundreds of files for various texture settings like:
+                    // noise_textures_{1,2,3,...}_{1,2,3...}.ron
+                    // realistically, in a complete project, this would be enabled and you would force specific resolutions.
+                    // like: 32, 64, 128, 256. probably hidden under a NoiseQuality enum
+                    #[cfg(feature = "serde")]
+                    cache_textures_locally: false,
                 })
                 .set_cycle(SkyCyclePlugin {
                     sky_time_settings: SkyTimeSettings::default(),

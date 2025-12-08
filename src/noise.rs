@@ -1,9 +1,12 @@
 use bevy::{
-    asset::RenderAssetUsages,
+    asset::{AssetLoader, RenderAssetUsages, saver::AssetSaver},
     image::{ImageAddressMode, ImageFilterMode, ImageSampler, ImageSamplerDescriptor},
     prelude::*,
-    render::render_resource::{Extent3d, TextureDimension},
+    render::render_resource::{Extent3d, TextureDataOrder, TextureDimension},
 };
+
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 // we will bake noise funcitons into textures for performance reasons
 // 3D textures for noise3d, and voronoi3d
@@ -23,6 +26,16 @@ impl Plugin for NoisePlugin {
         app.insert_resource(self.noise_settings.clone());
         app.add_systems(PreStartup, setup_noise_texture);
         app.add_systems(PostUpdate, update_noise_textures);
+
+        #[cfg(feature = "serde")]
+        {
+            app.init_asset::<NoiseTextureAsset>();
+            app.register_asset_loader(NoiseTextureAssetLoader);
+            app.add_systems(Update, on_asset_load_texture_update);
+        }
+        // if self.noise_settings.cache_textures_locally {
+
+        // }
     }
 }
 
@@ -38,7 +51,11 @@ pub struct NoiseSettings {
     ///! size of 3d noise texture
     pub voronoi_texture_size: u32,
 
+    #[cfg(feature = "serde")]
+    pub cache_textures_locally: bool,
+
     ///! if set, USERS may not exceed this size
+    #[cfg(feature = "serde")]
     pub noise_size_limit: Option<u32>,
 }
 
@@ -50,15 +67,59 @@ impl Default for NoiseSettings {
             voronoi_texture_size: 128,
             // prevent larger than 16 mb noise textures
             noise_size_limit: Some(256),
+            #[cfg(feature = "serde")]
+            cache_textures_locally: true,
         }
     }
 }
 
+#[cfg(feature = "serde")]
+fn texture_file_name(noise_size: u32, voronoi_size: u32) -> String {
+    format!("noise_textures_{}_{}.ron", noise_size, voronoi_size)
+}
+
+#[cfg(feature = "serde")]
+pub fn on_asset_load_texture_update(
+    mut commands: Commands,
+    assets: Res<Assets<NoiseTextureAsset>>,
+    mut images: ResMut<Assets<Image>>,
+    noise_handles: Res<NoiseHandles>,
+    pending: Option<Res<PendingNoiseTextureAsset>>,
+) {
+    let Some(pending) = pending else {
+        return;
+    };
+    let Some(noise_asset) = assets.get(&pending.0) else {
+        return;
+    };
+    commands.remove_resource::<PendingNoiseTextureAsset>();
+    info!("loaded an asset about to set it lol");
+    let noise3_img = images.get_mut(&noise_handles.noise3).unwrap();
+
+    noise3_img.resize(Extent3d {
+        width: noise_asset.noise3_size,
+        height: noise_asset.noise3_size,
+        depth_or_array_layers: noise_asset.noise3_size,
+    });
+
+    noise3_img.data = Some(noise_asset.noise3_raw.clone());
+
+    let voronoi3_img = images.get_mut(&noise_handles.voronoi3).unwrap();
+    voronoi3_img.resize(Extent3d {
+        width: noise_asset.voronoi3_size,
+        height: noise_asset.voronoi3_size,
+        depth_or_array_layers: noise_asset.voronoi3_size,
+    });
+    voronoi3_img.data = Some(noise_asset.voronoi_raw.clone());
+}
+
 pub fn update_noise_textures(
+    mut commands: Commands,
     mut images: ResMut<Assets<Image>>,
     noise_settings: Res<NoiseSettings>,
     noise_handles: Res<NoiseHandles>,
     mut repeated_calls: Local<i32>,
+    #[cfg(feature = "serde")] asset_server: Res<AssetServer>,
 ) {
     if !noise_settings.is_changed() {
         *repeated_calls = 0;
@@ -73,11 +134,31 @@ pub fn update_noise_textures(
         warn!("make sure NoiseSettings doesn't mutate every frame");
     }
 
+    // limit texture size
     let max_size = noise_settings.noise_size_limit.unwrap_or(u32::MAX);
     let noise_size = noise_settings.noise_texture_size.clamp(1, max_size);
     let voronoi_size = noise_settings.voronoi_texture_size.clamp(1, max_size);
 
-    // update full sky material
+    // load cached noise texture files if possible
+    #[cfg(feature = "serde")]
+    {
+        if noise_settings.cache_textures_locally {
+            let file_name = texture_file_name(noise_size, voronoi_size);
+
+            let fs_file_path = format!("assets/noise/{}", file_name);
+            // does file exists, then load otherwise create file and load
+            if std::fs::exists(path_relative_to_bevy_exe(&fs_file_path)).unwrap_or(false) {
+                // LOAD FILE
+                let bevy_file_path = format!("noise/{}", file_name);
+                let handle = asset_server.load::<NoiseTextureAsset>(bevy_file_path);
+                commands.insert_resource(PendingNoiseTextureAsset(handle));
+                return; // don't generate, load file instead
+            }
+            // else continue below, to generate the textures
+        }
+    }
+
+    // generate and set noise texture
     if let Some(noise3_image) = images.get_mut(&noise_handles.noise3) {
         let same_size = noise3_image.texture_descriptor.size.width == noise_size;
         if !same_size {
@@ -101,6 +182,30 @@ pub fn update_noise_textures(
             });
             let voronoi3_data = generate_voronoi3(voronoi_size as usize);
             voronoi3_image.data = Some(voronoi3_data);
+        }
+    }
+
+    // save the generated noise texture to file
+    #[cfg(feature = "serde")]
+    {
+        if noise_settings.cache_textures_locally {
+            // if both images exists we can save lol
+            if let (Some(n3_img), Some(v3_img)) = (
+                images.get(&noise_handles.noise3),
+                images.get(&noise_handles.voronoi3),
+            ) {
+                // clone the image data, to save to file
+                let asset = NoiseTextureAsset {
+                    noise3_raw: n3_img.data.clone().unwrap_or_default(),
+                    voronoi_raw: v3_img.data.clone().unwrap_or_default(),
+                    noise3_size: noise_size,
+                    voronoi3_size: voronoi_size,
+                };
+                info!("saving noise files!");
+                let dir = "assets/noise/";
+                let file_name = texture_file_name(noise_size, voronoi_size);
+                save_noise(dir, file_name.as_ref(), &asset);
+            }
         }
     }
 }
@@ -156,6 +261,10 @@ fn make_noise_sampler() -> ImageSampler {
         ..default()
     })
 }
+
+///! will wait until a noisetextureasset is loaded, then override hte texture data
+#[derive(Resource)]
+pub struct PendingNoiseTextureAsset(Handle<NoiseTextureAsset>);
 
 pub fn generate_noise3(size: usize) -> Vec<u8> {
     let mut voxels = vec![0u8; size * size * size];
@@ -265,4 +374,66 @@ fn hash33(p: Vec3) -> Vec3 {
     let mut p3 = (p * vec3(0.1031, 0.1030, 0.0973)).fract();
     p3 += Vec3::dot(p3, p3.yxz() + 33.33);
     return ((p3.xxy() + p3.yxx()) * p3.zyx()).fract();
+}
+
+///! file data of noise textures to avoid slow noise generation
+#[cfg(feature = "serde")]
+#[derive(Asset, TypePath, Clone, Serialize, Deserialize)]
+pub struct NoiseTextureAsset {
+    noise3_raw: Vec<u8>,
+    noise3_size: u32,
+    voronoi_raw: Vec<u8>,
+    voronoi3_size: u32,
+}
+
+#[cfg(feature = "serde")]
+#[derive(Debug, thiserror::Error)]
+pub enum NoiseTextureLoaderError {
+    #[error(transparent)]
+    Io(#[from] std::io::Error),
+    // #[error(transparent)]
+    #[error(transparent)]
+    DecodeError(#[from] bincode::error::DecodeError),
+    // RonSpannedError(#[from] ron::error::SpannedError),
+    #[error(transparent)]
+    LoadDirectError(#[from] bevy::asset::LoadDirectError),
+}
+
+#[cfg(feature = "serde")]
+pub struct NoiseTextureAssetLoader;
+
+#[cfg(feature = "serde")]
+impl AssetLoader for NoiseTextureAssetLoader {
+    type Asset = NoiseTextureAsset;
+    type Settings = ();
+    type Error = NoiseTextureLoaderError;
+
+    async fn load(
+        &self,
+        reader: &mut dyn bevy::asset::io::Reader,
+        _settings: &Self::Settings,
+        _load_context: &mut bevy::asset::LoadContext<'_>,
+    ) -> Result<NoiseTextureAsset, Self::Error> {
+        let mut bytes = Vec::new();
+        reader.read_to_end(&mut bytes).await?;
+        let (noise_texture_asset, _s): (NoiseTextureAsset, usize) =
+            bincode::serde::decode_from_slice(&bytes, bincode::config::standard())?;
+        Ok(noise_texture_asset)
+    }
+}
+
+fn path_relative_to_bevy_exe(path: &str) -> std::path::PathBuf {
+    let current_dir = bevy::asset::io::file::FileAssetReader::get_base_path();
+    let new_path = current_dir.join(path);
+    new_path
+}
+
+pub fn save_noise(dir: &str, file_name: &str, asset: &NoiseTextureAsset) {
+    let r = std::fs::create_dir_all(path_relative_to_bevy_exe(dir));
+    error!("create dir all result: {:?}", r);
+
+    let bytes = bincode::serde::encode_to_vec(&asset, bincode::config::standard()).unwrap();
+    let file_path = path_relative_to_bevy_exe(format!("{}{}", dir, file_name).as_str());
+    let r = std::fs::write(&file_path, bytes);
+    info!("file path: {:?}, result: {:?}", file_path, r);
 }
