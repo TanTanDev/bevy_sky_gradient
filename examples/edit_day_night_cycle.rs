@@ -42,6 +42,7 @@ fn main() {
                 .with_noise_settings(NoiseSettings {
                     noise_texture_size: 128,
                     voronoi_texture_size: 128,
+                    noise_size_limit: Some(256), // prevent massive noise textures
                 })
                 .set_cycle(SkyCyclePlugin {
                     sky_time_settings: SkyTimeSettings::default(),

@@ -5,10 +5,8 @@ use bevy::{
     render::render_resource::{Extent3d, TextureDimension},
 };
 
-use crate::sky_material::FullSkyMaterial;
 // we will bake noise funcitons into textures for performance reasons
 // 3D textures for noise3d, and voronoi3d
-
 #[derive(Resource)]
 pub struct NoiseHandles {
     pub noise3: Handle<Image>,
@@ -39,6 +37,9 @@ pub struct NoiseSettings {
     pub noise_texture_size: u32,
     ///! size of 3d noise texture
     pub voronoi_texture_size: u32,
+
+    ///! if set, USERS may not exceed this size
+    pub noise_size_limit: Option<u32>,
 }
 
 impl Default for NoiseSettings {
@@ -47,6 +48,8 @@ impl Default for NoiseSettings {
             noise_texture_size: 64,
             // stars looks much rounder 128, than 64
             voronoi_texture_size: 128,
+            // prevent larger than 16 mb noise textures
+            noise_size_limit: Some(256),
         }
     }
 }
@@ -55,8 +58,6 @@ pub fn update_noise_textures(
     mut images: ResMut<Assets<Image>>,
     noise_settings: Res<NoiseSettings>,
     noise_handles: Res<NoiseHandles>,
-    mut sky_handles: Query<&mut MeshMaterial3d<FullSkyMaterial>>,
-    mut sky_materials: ResMut<Assets<FullSkyMaterial>>,
     mut repeated_calls: Local<i32>,
 ) {
     if !noise_settings.is_changed() {
@@ -66,38 +67,41 @@ pub fn update_noise_textures(
     *repeated_calls += 1;
     if *repeated_calls > 10 {
         warn!(
-            "noise textures, was resized every last:{} frames!",
+            "noise textures, was resized every last: {} frames!",
             *repeated_calls
         );
         warn!("make sure NoiseSettings doesn't mutate every frame");
     }
-    if noise_settings.noise_texture_size > 514 || noise_settings.voronoi_texture_size > 514 {
-        error!("massive noise texture detected, not updating it...");
-        return;
-    }
-    let noise_size = noise_settings.noise_texture_size.max(1);
-    let voronoi_size = noise_settings.voronoi_texture_size.max(1);
+
+    let max_size = noise_settings.noise_size_limit.unwrap_or(u32::MAX);
+    let noise_size = noise_settings.noise_texture_size.clamp(1, max_size);
+    let voronoi_size = noise_settings.voronoi_texture_size.clamp(1, max_size);
+
     // update full sky material
     if let Some(noise3_image) = images.get_mut(&noise_handles.noise3) {
-        noise3_image.resize(Extent3d {
-            width: noise_size,
-            height: noise_size,
-            depth_or_array_layers: noise_size,
-        });
-        let noise3_data = generate_noise3(noise_size as usize);
-        noise3_image.data = Some(noise3_data);
-        info!("set noise texture size: {:?}", noise_size);
+        let same_size = noise3_image.texture_descriptor.size.width == noise_size;
+        if !same_size {
+            noise3_image.resize(Extent3d {
+                width: noise_size,
+                height: noise_size,
+                depth_or_array_layers: noise_size,
+            });
+            let noise3_data = generate_noise3(noise_size as usize);
+            noise3_image.data = Some(noise3_data);
+        }
     }
 
     if let Some(voronoi3_image) = images.get_mut(&noise_handles.voronoi3) {
-        voronoi3_image.resize(Extent3d {
-            width: voronoi_size,
-            height: voronoi_size,
-            depth_or_array_layers: voronoi_size,
-        });
-        let voronoi3_data = generate_voronoi3(voronoi_size as usize);
-        voronoi3_image.data = Some(voronoi3_data);
-        info!("set voronoi texture size: {:?}", voronoi_size);
+        let same_size = voronoi3_image.texture_descriptor.size.width == voronoi_size;
+        if !same_size {
+            voronoi3_image.resize(Extent3d {
+                width: voronoi_size,
+                height: voronoi_size,
+                depth_or_array_layers: voronoi_size,
+            });
+            let voronoi3_data = generate_voronoi3(voronoi_size as usize);
+            voronoi3_image.data = Some(voronoi3_data);
+        }
     }
 }
 
@@ -153,7 +157,6 @@ fn make_noise_sampler() -> ImageSampler {
     })
 }
 
-///! min recommended size: 64   64x64x64
 pub fn generate_noise3(size: usize) -> Vec<u8> {
     let mut voxels = vec![0u8; size * size * size];
 
