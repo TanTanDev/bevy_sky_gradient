@@ -6,7 +6,7 @@ use bevy::{
 };
 
 use crate::{
-    aurora::{AuroraPlugin, AuroraSettings},
+    aurora::AuroraPlugin,
     cycle::SkyCyclePlugin,
     gradient::GradientDriverPlugin,
     noise::{NoiseHandles, NoisePlugin, NoiseSettings},

@@ -1,11 +1,6 @@
 use bevy::{
-    asset::RenderAssetUsages,
-    image::ImageSampler,
     prelude::*,
-    render::{
-        render_resource::{Extent3d, TextureDimension, TextureFormat, TextureUsages},
-        view::RenderLayers,
-    },
+    render::{render_resource::Extent3d, view::RenderLayers},
     window::{PrimaryWindow, WindowResized},
 };
 

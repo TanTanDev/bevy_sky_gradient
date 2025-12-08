@@ -1,8 +1,8 @@
 use bevy::{
-    asset::{AssetLoader, RenderAssetUsages, saver::AssetSaver},
+    asset::{AssetLoader, RenderAssetUsages},
     image::{ImageAddressMode, ImageFilterMode, ImageSampler, ImageSamplerDescriptor},
     prelude::*,
-    render::render_resource::{Extent3d, TextureDataOrder, TextureDimension},
+    render::render_resource::{Extent3d, TextureDimension},
 };
 
 #[cfg(feature = "serde")]
