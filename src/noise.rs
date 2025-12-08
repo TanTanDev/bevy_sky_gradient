@@ -33,9 +33,6 @@ impl Plugin for NoisePlugin {
             app.register_asset_loader(NoiseTextureAssetLoader);
             app.add_systems(Update, on_asset_load_texture_update);
         }
-        // if self.noise_settings.cache_textures_locally {
-
-        // }
     }
 }
 
@@ -93,24 +90,30 @@ pub fn on_asset_load_texture_update(
         return;
     };
     commands.remove_resource::<PendingNoiseTextureAsset>();
-    info!("loaded an asset about to set it lol");
-    let noise3_img = images.get_mut(&noise_handles.noise3).unwrap();
+    match images.get_mut(&noise_handles.noise3) {
+        Some(noise3_img) => {
+            noise3_img.resize(Extent3d {
+                width: noise_asset.noise3_size,
+                height: noise_asset.noise3_size,
+                depth_or_array_layers: noise_asset.noise3_size,
+            });
 
-    noise3_img.resize(Extent3d {
-        width: noise_asset.noise3_size,
-        height: noise_asset.noise3_size,
-        depth_or_array_layers: noise_asset.noise3_size,
-    });
+            noise3_img.data = Some(noise_asset.noise3_raw.clone());
+        }
+        None => warn!("SkyPlugin: Failed to set noise3 texture, no asset"),
+    }
 
-    noise3_img.data = Some(noise_asset.noise3_raw.clone());
-
-    let voronoi3_img = images.get_mut(&noise_handles.voronoi3).unwrap();
-    voronoi3_img.resize(Extent3d {
-        width: noise_asset.voronoi3_size,
-        height: noise_asset.voronoi3_size,
-        depth_or_array_layers: noise_asset.voronoi3_size,
-    });
-    voronoi3_img.data = Some(noise_asset.voronoi_raw.clone());
+    match images.get_mut(&noise_handles.voronoi3) {
+        Some(voronoi3_img) => {
+            voronoi3_img.resize(Extent3d {
+                width: noise_asset.voronoi3_size,
+                height: noise_asset.voronoi3_size,
+                depth_or_array_layers: noise_asset.voronoi3_size,
+            });
+            voronoi3_img.data = Some(noise_asset.voronoi_raw.clone());
+        }
+        None => warn!("SkyPlugin: Failed to set voronoi3 texture, no asset"),
+    }
 }
 
 pub fn update_noise_textures(
@@ -128,10 +131,10 @@ pub fn update_noise_textures(
     *repeated_calls += 1;
     if *repeated_calls > 10 {
         warn!(
-            "noise textures, was resized every last: {} frames!",
+            "SkyPlugin: noise textures, was resized every last: {} frames!",
             *repeated_calls
         );
-        warn!("make sure NoiseSettings doesn't mutate every frame");
+        warn!("SkyPlugin: make sure NoiseSettings doesn't mutate every frame");
     }
 
     // limit texture size
@@ -152,7 +155,7 @@ pub fn update_noise_textures(
                 let bevy_file_path = format!("noise/{}", file_name);
                 let handle = asset_server.load::<NoiseTextureAsset>(bevy_file_path);
                 commands.insert_resource(PendingNoiseTextureAsset(handle));
-                return; // don't generate, load file instead
+                return;
             }
             // else continue below, to generate the textures
         }
@@ -201,7 +204,6 @@ pub fn update_noise_textures(
                     noise3_size: noise_size,
                     voronoi3_size: voronoi_size,
                 };
-                info!("saving noise files!");
                 let dir = "assets/noise/";
                 let file_name = texture_file_name(noise_size, voronoi_size);
                 save_noise(dir, file_name.as_ref(), &asset);
@@ -391,10 +393,8 @@ pub struct NoiseTextureAsset {
 pub enum NoiseTextureLoaderError {
     #[error(transparent)]
     Io(#[from] std::io::Error),
-    // #[error(transparent)]
     #[error(transparent)]
     DecodeError(#[from] bincode::error::DecodeError),
-    // RonSpannedError(#[from] ron::error::SpannedError),
     #[error(transparent)]
     LoadDirectError(#[from] bevy::asset::LoadDirectError),
 }
@@ -429,11 +429,26 @@ fn path_relative_to_bevy_exe(path: &str) -> std::path::PathBuf {
 }
 
 pub fn save_noise(dir: &str, file_name: &str, asset: &NoiseTextureAsset) {
-    let r = std::fs::create_dir_all(path_relative_to_bevy_exe(dir));
-    error!("create dir all result: {:?}", r);
+    let path = path_relative_to_bevy_exe(dir);
+    if let Err(err) = std::fs::create_dir_all(&path) {
+        error!(
+            "SkyPlugin: failed to create_dir_all path: {:?}: error: {:?}",
+            path, err
+        );
+    }
 
-    let bytes = bincode::serde::encode_to_vec(&asset, bincode::config::standard()).unwrap();
-    let file_path = path_relative_to_bevy_exe(format!("{}{}", dir, file_name).as_str());
-    let r = std::fs::write(&file_path, bytes);
-    info!("file path: {:?}, result: {:?}", file_path, r);
+    match bincode::serde::encode_to_vec(&asset, bincode::config::standard()) {
+        Ok(bytes) => {
+            let file_path = path_relative_to_bevy_exe(format!("{}{}", dir, file_name).as_str());
+            if let Err(err) = std::fs::write(&file_path, bytes) {
+                info!(
+                    "SkyPlugin: failed to fs::write path: {:?}, result: {:?}",
+                    file_path, err
+                );
+            }
+        }
+        Err(err) => {
+            error!("SkyPlugin: failed to encode asset err: {:?}", err);
+        }
+    }
 }
