@@ -4,7 +4,7 @@ use bevy::{prelude::*, render::render_resource::ShaderType};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Reflect, ShaderType)]
-pub struct GradientSettings {
+pub struct GradientBindGroup {
     ///! the colors of sky
     pub color_stops: [Vec4; 4],
     ///! where the color gradients are positioned
@@ -15,7 +15,7 @@ pub struct GradientSettings {
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Debug, Reflect, ShaderType)]
-pub struct StarsSettings {
+pub struct StarsBindGroup {
     ///! how fast to rotate sky per sec in radians
     pub sky_rotation_speed: f32,
     pub sample_scale: f32,
@@ -27,7 +27,7 @@ pub struct StarsSettings {
     pub blink_variance_scale: f32,
 }
 
-impl Default for StarsSettings {
+impl Default for StarsBindGroup {
     fn default() -> Self {
         Self {
             sky_rotation_speed: 0.01,
@@ -43,14 +43,14 @@ impl Default for StarsSettings {
 }
 
 #[derive(Clone, Debug, Reflect, ShaderType)]
-pub struct SunSettings {
+pub struct SunBindGroup {
     pub sun_dir: Vec3,
     pub sun_color: Vec4,
     pub sun_strength: f32,
     pub sun_sharpness: f32,
 }
 
-impl Default for SunSettings {
+impl Default for SunBindGroup {
     fn default() -> Self {
         Self {
             sun_dir: Vec3::new(0.0, 0.1, -1.0),
@@ -63,7 +63,7 @@ impl Default for SunSettings {
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Debug, Reflect, ShaderType)]
-pub struct AuroraSettings {
+pub struct AuroraBindGroup {
     pub color_bottom: LinearRgba,
     pub alpha: f32,
     pub density: f32,
@@ -87,7 +87,7 @@ pub struct AuroraSettings {
     pub opacity_per_sample: f32,
 }
 
-impl Default for AuroraSettings {
+impl Default for AuroraBindGroup {
     fn default() -> Self {
         Self {
             color_bottom: LinearRgba::new(0.0, 1.0, 0.2, 1.0),

@@ -1,12 +1,12 @@
 use bevy::prelude::*;
 use bevy::render::render_resource::{AsBindGroup, CompareFunction, ShaderRef};
 
-use crate::bind_groups::AuroraSettings;
+use crate::bind_groups::AuroraBindGroup;
 
 #[derive(Asset, AsBindGroup, Reflect, Debug, Clone)]
 pub struct AuroraMaterial {
     #[uniform(0)]
-    pub aurora_settings: crate::bind_groups::AuroraSettings,
+    pub aurora_settings: crate::bind_groups::AuroraBindGroup,
 
     #[texture(1, dimension = "3d")]
     #[sampler(2)]
@@ -39,7 +39,7 @@ impl Material for AuroraMaterial {
 impl Default for AuroraMaterial {
     fn default() -> Self {
         AuroraMaterial {
-            aurora_settings: AuroraSettings::default(),
+            aurora_settings: AuroraBindGroup::default(),
             noise3_image: Handle::default(),
         }
     }

@@ -1,16 +1,16 @@
 use bevy::prelude::*;
 use bevy::render::render_resource::{AsBindGroup, CompareFunction, ShaderRef};
 
-use crate::bind_groups::{GradientSettings, StarsSettings, SunSettings};
+use crate::bind_groups::{GradientBindGroup, StarsBindGroup, SunBindGroup};
 
 #[derive(Asset, AsBindGroup, Reflect, Debug, Clone)]
 pub struct FullSkyMaterial {
     #[uniform(0)]
-    pub gradient_settings: crate::bind_groups::GradientSettings,
+    pub gradient_settings: crate::bind_groups::GradientBindGroup,
     #[uniform(1)]
-    pub sun: crate::bind_groups::SunSettings,
+    pub sun: crate::bind_groups::SunBindGroup,
     #[uniform(2)]
-    pub stars: crate::bind_groups::StarsSettings,
+    pub stars: crate::bind_groups::StarsBindGroup,
     ///! auto set. 0 = NO night, 1 = FULL night
     ///! a full night cycle will go from 0 -> 1 -> 0
     #[uniform(3)]
@@ -76,12 +76,12 @@ impl Default for FullSkyMaterial {
             Vec4::new(0.5, 0.7, 1.0, 1.0),
         ];
         FullSkyMaterial {
-            gradient_settings: GradientSettings {
+            gradient_settings: GradientBindGroup {
                 color_stops,
                 positions: Vec4::new(0.38, 0.47, 0.61, 1.0),
                 num_stops: 4,
             },
-            sun: SunSettings {
+            sun: SunBindGroup {
                 sun_dir: Vec3::new(0.0, 0.1, -1.0),
                 sun_color: Vec4::new(1.0, 1.0, 0.5, 1.0),
                 sun_strength: 1.5,
@@ -89,7 +89,7 @@ impl Default for FullSkyMaterial {
             },
             night_time_distance: 0.0,
             night_visibility_range: vec2(0.0, 0.1),
-            stars: StarsSettings::default(),
+            stars: StarsBindGroup::default(),
             noise3_image: Handle::default(),
             voronoi3_image: Handle::default(),
             aurora_image: Handle::default(),

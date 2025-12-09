@@ -54,10 +54,10 @@ pub const DEFAULT_SKY_COLORS_BUILDER: SkyColorsBuilder = SkyColorsBuilder {
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Default)]
 pub struct SkyPreset {
-    pub aurora_settings: Option<crate::bind_groups::AuroraSettings>,
+    pub aurora_settings: Option<crate::bind_groups::AuroraBindGroup>,
     pub sun_settings: Option<SunSettings>,
     pub sky_colors_builder: Option<SkyColorsBuilder>,
-    pub stars: Option<crate::bind_groups::StarsSettings>,
+    pub stars: Option<crate::bind_groups::StarsBindGroup>,
 }
 
 pub struct SkyPresetPlugin;
