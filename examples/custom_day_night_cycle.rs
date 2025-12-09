@@ -1,6 +1,5 @@
 use bevy::{color::palettes::css::WHITE, pbr::light_consts::lux::AMBIENT_DAYLIGHT, prelude::*};
 use bevy_flycam::{FlyCam, NoCameraPlayerPlugin};
-use bevy_inspector_egui::egui::Color32;
 use bevy_sky_gradient::{
     cycle::{SkyCyclePlugin, SkyTime, SkyTimeSettings},
     gradient::{GradientDriverPlugin, SkyColorsBuilder, StopsColors},
@@ -43,17 +42,17 @@ fn main() {
                 // except for the day high, which we make very wonky
                 .set_gradient_driver(GradientDriverPlugin {
                     sky_colors_builder: SkyColorsBuilder {
-                        sunset_color: StopsColors::new_splat(Color32::RED),
-                        sunrise_color: StopsColors::new_splat(Color32::RED),
-                        day_low_color: StopsColors::new_splat(Color32::LIGHT_BLUE),
+                        sunset_color: StopsColors::new_splat([255, 0, 0, 255]),
+                        sunrise_color: StopsColors::new_splat([255, 0, 0, 255]),
+                        day_low_color: StopsColors::new_splat([100, 100, 255, 255]),
                         day_high_color: StopsColors {
                             stop0: [0, 255, 0, 255],
                             stop1: [255, 0, 0, 255],
                             stop2: [0, 0, 255, 255],
                             stop3: [0, 255, 255, 255],
                         },
-                        night_low_color: StopsColors::new_splat(Color32::DARK_BLUE),
-                        night_high_color: StopsColors::new_splat(Color32::BLACK),
+                        night_low_color: StopsColors::new_splat([0, 0, 70, 255]),
+                        night_high_color: StopsColors::new_splat([0, 0, 0, 255]),
                     },
                 })
                 .build(),

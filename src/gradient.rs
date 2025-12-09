@@ -1,6 +1,4 @@
 use bevy::prelude::*;
-use bevy_inspector_egui::egui::Color32;
-use egui_colorgradient::{Gradient, InterpolationMethod};
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -64,19 +62,15 @@ impl Clone for SkyColors {
         Self {
             sky_color0: Gradient {
                 stops: self.sky_color0.stops.clone(),
-                interpolation_method: self.sky_color0.interpolation_method,
             },
             sky_color1: Gradient {
                 stops: self.sky_color1.stops.clone(),
-                interpolation_method: self.sky_color1.interpolation_method,
             },
             sky_color2: Gradient {
                 stops: self.sky_color2.stops.clone(),
-                interpolation_method: self.sky_color2.interpolation_method,
             },
             sky_color3: Gradient {
                 stops: self.sky_color3.stops.clone(),
-                interpolation_method: self.sky_color3.interpolation_method,
             },
         }
     }
@@ -110,13 +104,7 @@ fn drive_gradients(
 
     let percent = sky_time_settings.time_percent(sky_time.time);
 
-    let color_from_gradient = |gradient: &Gradient| -> [f32; 4] {
-        gradient
-            .interpolator()
-            .sample_at(percent)
-            .unwrap()
-            .to_array()
-    };
+    let color_from_gradient = |gradient: &Gradient| -> [f32; 4] { gradient.sample_at(percent) };
     skybox_material.gradient_settings.color_stops[0] =
         color_from_gradient(&sky_colors.sky_color0).into();
     skybox_material.gradient_settings.color_stops[1] =
@@ -165,28 +153,25 @@ impl SkyColorsBuilder {
         let sunset_start = 0.5 - s.sunset_percent_day() * 0.5;
         let sunset_end = 0.5 + s.sunset_percent_night() * 0.5;
         let sunrise_start = 1.0 - s.sunrise_percent_night() * 0.5;
-        Gradient::new(
-            InterpolationMethod::Linear,
-            vec![
-                (0.0, self.sunrise_color.get_stop(stop_pos)),
-                (sunrise_end, self.day_low_color.get_stop(stop_pos)),
-                (
-                    // sun high is between sunrise end, and
-                    (sunrise_end + sunset_start) * 0.5,
-                    self.day_high_color.get_stop(stop_pos),
-                ),
-                (sunset_start, self.day_low_color.get_stop(stop_pos)),
-                (0.5, self.sunset_color.get_stop(stop_pos)),
-                (sunset_end, self.night_low_color.get_stop(stop_pos)),
-                (
-                    // sun night high is between the sunset end and sunrise start
-                    (sunset_end + sunrise_start) * 0.5,
-                    self.night_high_color.get_stop(stop_pos),
-                ),
-                (sunrise_start, self.night_low_color.get_stop(stop_pos)),
-                (1.0, self.sunrise_color.get_stop(stop_pos)),
-            ],
-        )
+        Gradient::new(vec![
+            (0.0, self.sunrise_color.get_stop(stop_pos)),
+            (sunrise_end, self.day_low_color.get_stop(stop_pos)),
+            (
+                // sun high is between sunrise end, and
+                (sunrise_end + sunset_start) * 0.5,
+                self.day_high_color.get_stop(stop_pos),
+            ),
+            (sunset_start, self.day_low_color.get_stop(stop_pos)),
+            (0.5, self.sunset_color.get_stop(stop_pos)),
+            (sunset_end, self.night_low_color.get_stop(stop_pos)),
+            (
+                // sun night high is between the sunset end and sunrise start
+                (sunset_end + sunrise_start) * 0.5,
+                self.night_high_color.get_stop(stop_pos),
+            ),
+            (sunrise_start, self.night_low_color.get_stop(stop_pos)),
+            (1.0, self.sunrise_color.get_stop(stop_pos)),
+        ])
     }
 }
 
@@ -203,20 +188,93 @@ pub struct StopsColors {
 }
 
 impl StopsColors {
-    pub fn new_splat(color: Color32) -> Self {
+    pub fn new_splat(color: [u8; 4]) -> Self {
         Self {
-            stop0: color.to_array(),
-            stop1: color.to_array(),
-            stop2: color.to_array(),
-            stop3: color.to_array(),
+            stop0: color,
+            stop1: color,
+            stop2: color,
+            stop3: color,
         }
     }
-    pub fn get_stop(&self, stop_pos: i32) -> Color32 {
+    pub fn get_stop(&self, stop_pos: i32) -> [u8; 4] {
         match stop_pos {
-            0 => Color32::from_rgb(self.stop0[0], self.stop0[1], self.stop0[2]),
-            1 => Color32::from_rgb(self.stop1[0], self.stop1[1], self.stop1[2]),
-            2 => Color32::from_rgb(self.stop2[0], self.stop2[1], self.stop2[2]),
-            _ => Color32::from_rgb(self.stop3[0], self.stop3[1], self.stop3[2]),
+            0 => [self.stop0[0], self.stop0[1], self.stop0[2], self.stop0[3]],
+            1 => [self.stop1[0], self.stop1[1], self.stop1[2], self.stop1[3]],
+            2 => [self.stop2[0], self.stop2[1], self.stop2[2], self.stop2[3]],
+            _ => [self.stop3[0], self.stop3[1], self.stop3[2], self.stop3[3]],
         }
+    }
+}
+
+use std::cmp::Ordering;
+
+/// A color gradient with linear interpolation.
+#[derive(Clone, Debug, PartialEq)]
+pub struct Gradient {
+    pub stops: Vec<(f32, [u8; 4])>,
+}
+
+impl Gradient {
+    /// Create a new gradient. Stops are automatically sorted by position.
+    pub fn new(mut stops: Vec<(f32, [u8; 4])>) -> Self {
+        stops.sort_by(|(a, _), (b, _)| a.partial_cmp(b).unwrap_or(Ordering::Equal));
+        Self { stops }
+    }
+
+    /// Sort the stops. Call this if you manually modify the `stops` vector.
+    pub fn sort(&mut self) {
+        self.stops
+            .sort_by(|(a, _), (b, _)| a.partial_cmp(b).unwrap_or(Ordering::Equal));
+    }
+
+    /// Sample the gradient at position `t` (0.0 to 1.0).
+    /// Returns a normalized color [f32; 4] where channels are 0.0 to 1.0.
+    pub fn sample_at(&self, t: f32) -> [f32; 4] {
+        if self.stops.is_empty() {
+            return [0.0, 0.0, 0.0, 1.0];
+        }
+
+        // Find insertion point
+        let idx = self.stops.partition_point(|(x, _)| *x < t);
+
+        // Helper to convert u8 [0-255] to f32 [0.0-1.0]
+        let to_f32 = |c: [u8; 4]| {
+            [
+                c[0] as f32 / 255.0,
+                c[1] as f32 / 255.0,
+                c[2] as f32 / 255.0,
+                c[3] as f32 / 255.0,
+            ]
+        };
+
+        if idx == 0 {
+            return to_f32(self.stops[0].1);
+        }
+        if idx >= self.stops.len() {
+            return to_f32(self.stops.last().unwrap().1);
+        }
+
+        let (t0, c0_u8) = self.stops[idx - 1];
+        let (t1, c1_u8) = self.stops[idx];
+
+        let c0 = to_f32(c0_u8);
+        let c1 = to_f32(c1_u8);
+
+        // Linear interpolation
+        let ratio = ((t - t0) / (t1 - t0)).clamp(0.0, 1.0);
+        let lerp = |a: f32, b: f32| a + (b - a) * ratio;
+
+        [
+            lerp(c0[0], c1[0]),
+            lerp(c0[1], c1[1]),
+            lerp(c0[2], c1[2]),
+            lerp(c0[3], c1[3]),
+        ]
+    }
+}
+
+impl Default for Gradient {
+    fn default() -> Self {
+        Self::new(vec![(0.0, [0, 0, 0, 255]), (1.0, [255, 255, 255, 255])])
     }
 }

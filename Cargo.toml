@@ -4,18 +4,13 @@ version = "0.1.0"
 edition = "2024"
 
 [features]
-default = ["cycle", "serde"]
-# our built in day-night cycle implementation, uses cycle::Gradient
-cycle = ["egui-colorgradient", "bevy-inspector-egui"]
+default = ["serde"]
 serde = ["dep:serde", "dep:ron", "dep:bincode"]
 
 [dependencies]
 bevy = "0.16"
 rust-embed = "8" # to embed assets like .wgsl
 thiserror = "2"
-
-egui-colorgradient = {version="0.2.3", optional = true}
-bevy-inspector-egui = {version = "0.33", optional = true}
 
 # optional serialization
 serde = { version= "1", features = ["derive"], optional = true }
@@ -26,3 +21,5 @@ bincode = {version = "2", optional = true, features = ["serde"]}
 
 [dev-dependencies]
 bevy_flycam = "0.16.1"
+egui-colorgradient = "0.2.3"
+bevy-inspector-egui = "0.33"

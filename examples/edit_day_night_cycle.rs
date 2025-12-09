@@ -4,7 +4,7 @@ use bevy_sky_gradient::{
     aurora::AuroraSettings,
     aurora_material::AuroraMaterial,
     cycle::{SkyCyclePlugin, SkyTime, SkyTimeSettings},
-    gradient::SkyColors,
+    gradient::{Gradient, SkyColors},
     noise::NoiseSettings,
     plugin::{SkyPlugin, SkyboxMagnetTag},
     sky_material::FullSkyMaterial,
@@ -31,7 +31,6 @@ fn main() {
         .add_plugins(DefaultPlugins)
         // egui
         .add_plugins(EguiPlugin::default())
-        // .add_plugins(WorldInspectorPlugin::new())
         .add_plugins(AssetInspectorPlugin::<FullSkyMaterial>::default())
         .add_plugins(AssetInspectorPlugin::<AuroraMaterial>::default())
         .add_plugins(ResourceInspectorPlugin::<AuroraSettings>::default())
@@ -111,20 +110,28 @@ fn edit_ui(mut world: &mut World) {
     #[cfg(feature = "serde")]
     show_save_load_preset_uis(world, &mut egui_context);
 
-    egui::Window::new("colors").show(egui_context.get_mut(), |ui| {
+    egui::Window::new("gradient colors").show(egui_context.get_mut(), |mut ui| {
         let mut sky_colors = world.get_resource_mut::<SkyColors>().unwrap();
-        ui.push_id("c1", |ui| {
-            gradient_editor(ui, &mut sky_colors.sky_color0);
-        });
-        ui.push_id("c2", |ui| {
-            gradient_editor(ui, &mut sky_colors.sky_color1);
-        });
-        ui.push_id("c3", |ui| {
-            gradient_editor(ui, &mut sky_colors.sky_color2);
-        });
-        ui.push_id("c4", |ui| {
-            gradient_editor(ui, &mut sky_colors.sky_color3);
-        });
+        let mut id = 0;
+        // helper function to render gradient ui
+        // convert our Gradient, to the egui_colorgradient::Gradient
+        // not optimized, but this is just for debug ui :)
+        let mut show_gradient = |gradient: &mut Gradient, ui: &mut egui::Ui| {
+            let mut c_0: egui_colorgradient::Gradient = gradient_to_egui(gradient.clone());
+            id += 1;
+            ui.push_id(id.to_string().as_str(), |ui| {
+                gradient_editor(ui, &mut c_0);
+            });
+            let mut stops = Vec::with_capacity(4);
+            for (weight, hsva) in c_0.stops.iter() {
+                stops.push((*weight, hsva.to_srgba_premultiplied()));
+            }
+            gradient.stops = stops;
+        };
+        show_gradient(&mut sky_colors.sky_color0, &mut ui);
+        show_gradient(&mut sky_colors.sky_color1, &mut ui);
+        show_gradient(&mut sky_colors.sky_color2, &mut ui);
+        show_gradient(&mut sky_colors.sky_color3, &mut ui);
     });
 
     egui::Window::new("sky settings").show(egui_context.get_mut(), |ui| {
@@ -248,4 +255,21 @@ fn setup_egui_render_layer(
         },
         RenderLayers::none(),
     ));
+}
+
+use bevy_inspector_egui::egui::Color32;
+
+fn gradient_to_egui(gradient: Gradient) -> egui_colorgradient::Gradient {
+    use egui_colorgradient::InterpolationMethod;
+    let mut stops = Vec::with_capacity(4);
+    for (weight, color) in gradient.stops.iter() {
+        stops.push((
+            *weight,
+            Color32::from_rgba_premultiplied(color[0], color[1], color[2], color[3]).into(),
+        ));
+    }
+    egui_colorgradient::Gradient {
+        stops: stops,
+        interpolation_method: InterpolationMethod::Linear,
+    }
 }
