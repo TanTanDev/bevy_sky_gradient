@@ -22,6 +22,9 @@ use bevy_inspector_egui::{
 };
 use egui_colorgradient::gradient_editor;
 
+#[cfg(feature = "serde")]
+use ron::ser::PrettyConfig;
+
 // this example showcase live tweaking via egui ui.
 fn main() {
     App::new()
@@ -90,12 +93,23 @@ fn setup(
     ));
 }
 
+// helper ui things to save our sky look to SkyPreset files
+#[cfg(feature = "serde")]
+#[derive(Resource)]
+struct SkyPresetFileName(String);
+#[cfg(feature = "serde")]
+#[derive(Resource)]
+struct SkyPresetResult(String);
+
 fn edit_ui(mut world: &mut World) {
     let mut egui_context = world
         .query_filtered::<&mut EguiContext, With<bevy_egui::PrimaryEguiContext>>()
         .single(world)
         .expect("EguiContext not found")
         .clone();
+
+    #[cfg(feature = "serde")]
+    show_save_load_preset_uis(world, &mut egui_context);
 
     egui::Window::new("colors").show(egui_context.get_mut(), |ui| {
         let mut sky_colors = world.get_resource_mut::<SkyColors>().unwrap();
@@ -131,6 +145,89 @@ fn edit_ui(mut world: &mut World) {
             ui.label("ambient color");
             ui_for_resource::<AmbientLight>(world, ui);
         });
+    });
+}
+
+#[cfg(feature = "serde")]
+fn show_save_load_preset_uis(world: &mut World, egui_context: &mut EguiContext) {
+    use bevy_sky_gradient::gradient::SkyColorsBuilder;
+    use bevy_sky_gradient::presets::{ApplyPresetEvent, SkyPreset};
+    use bevy_sky_gradient::utils::path_relative_to_bevy_exe;
+
+    egui::Window::new("SAVE PRESET").show(egui_context.get_mut(), |ui| {
+        let _ = world.get_resource_or_insert_with(|| SkyPresetResult(String::default()));
+        let mut file_name =
+            world.get_resource_or_insert_with(|| SkyPresetFileName(String::default()));
+        ui.label("file name:");
+        ui.text_edit_singleline(&mut file_name.0);
+        let sky_preset_folder = "assets/sky_presets/";
+        let sky_preset_folder = path_relative_to_bevy_exe(sky_preset_folder);
+        if ui.button("save").clicked() {
+            if file_name.0.is_empty() {
+                return;
+            }
+
+            let file_name = file_name.0.clone();
+            // fetch the bind group from the aurora
+            let all_aurora_material = world.get_resource::<Assets<AuroraMaterial>>().unwrap();
+            let current_aurora_material = all_aurora_material.iter().next().unwrap().1;
+
+            let all_sky_materials = world.get_resource::<Assets<FullSkyMaterial>>().unwrap();
+            let current_sky_material = all_sky_materials.iter().next().unwrap().1;
+
+            let sun_settings = world.get_resource::<SunSettings>().unwrap();
+            let sky_colors_builder = world.get_resource::<SkyColorsBuilder>().unwrap();
+            // fetch the sky information
+            let sky_preset = SkyPreset {
+                aurora_settings: Some(current_aurora_material.aurora_settings.clone()),
+                sun_settings: Some(sun_settings.clone()),
+                sky_colors_builder: Some(sky_colors_builder.clone()),
+                stars: Some(current_sky_material.stars.clone()),
+            };
+            let sky_preset = ron::ser::to_string_pretty(&sky_preset, PrettyConfig::default());
+            let sky_preset = sky_preset.unwrap();
+
+            let mut result = world.get_resource_mut::<SkyPresetResult>().unwrap();
+            if let Err(err) = std::fs::create_dir_all(&sky_preset_folder) {
+                result.0 = format!(
+                    "err, failed to make folder: {:?}, error: {:?}",
+                    sky_preset_folder, err
+                );
+                return;
+            }
+            let path = format!("{}{}.ron", sky_preset_folder.to_string_lossy(), file_name);
+            let save_result = std::fs::write(path, sky_preset);
+            result.0 = format!("save result: {:?}", save_result);
+        }
+
+        if let Ok(read_dir) = std::fs::read_dir(sky_preset_folder) {
+            ui.label("-- LOAD PRESET FILES --");
+            for entry in read_dir.into_iter().flatten() {
+                if ui.button(entry.file_name().to_string_lossy()).clicked() {
+                    match std::fs::read(entry.path()) {
+                        Ok(bytes) => match ron::de::from_bytes::<SkyPreset>(&bytes) {
+                            Ok(preset) => {
+                                world.send_event(ApplyPresetEvent { sky_preset: preset });
+                            }
+                            Err(err) => {
+                                let mut result =
+                                    world.get_resource_mut::<SkyPresetResult>().unwrap();
+                                result.0 = format!("faield to deserialize file: {:?}", err);
+                            }
+                        },
+                        Err(err) => {
+                            let mut result = world.get_resource_mut::<SkyPresetResult>().unwrap();
+                            result.0 = format!("failed to read file err: {:?}", err);
+                        }
+                    }
+                }
+            }
+        } else {
+            ui.label("no files inside assets/presets");
+        }
+
+        let result = world.get_resource_or_insert_with(|| SkyPresetResult(String::default()));
+        ui.label(&result.0);
     });
 }
 

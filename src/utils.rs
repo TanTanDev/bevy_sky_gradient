@@ -35,3 +35,10 @@ pub fn flip_mesh_normals(mesh: &mut Mesh) {
         }
     }
 }
+
+#[cfg(feature = "serde")]
+pub fn path_relative_to_bevy_exe(path: &str) -> std::path::PathBuf {
+    let current_dir = bevy::asset::io::file::FileAssetReader::get_base_path();
+    let new_path = current_dir.join(path);
+    new_path
+}

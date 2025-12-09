@@ -7,10 +7,14 @@ use crate::{
     sky_material::FullSkyMaterial,
 };
 
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
 // Marker for updating the position of the light
 #[derive(Component)]
 pub struct SunDriverTag;
 
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Resource, Reflect, Clone)]
 pub struct SunSettings {
     pub illuminance: f32,

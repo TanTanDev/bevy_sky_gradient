@@ -2,6 +2,9 @@ use bevy::prelude::*;
 use bevy_inspector_egui::egui::Color32;
 use egui_colorgradient::{Gradient, InterpolationMethod};
 
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
 use crate::{
     cycle::{SkyTime, SkyTimeSettings},
     sky_material::FullSkyMaterial,
@@ -21,7 +24,9 @@ impl Plugin for GradientDriverPlugin {
         app.insert_resource(self.sky_colors_builder.build(&SkyTimeSettings::default()));
         app.add_systems(
             Update,
-            update_sky_colors_builder.run_if(resource_changed::<SkyTimeSettings>),
+            update_sky_colors_builder.run_if(
+                resource_changed::<SkyTimeSettings>.or(resource_changed::<SkyColorsBuilder>),
+            ),
         );
         // save the color builder so we can rebuild SkyColors on SkyTimeSettings changes
         app.insert_resource(self.sky_colors_builder.clone());
@@ -125,6 +130,7 @@ fn drive_gradients(
 /// helper for designing gradients based upon time settings
 ///! if we want specific time of day colors. like "day_high_color"
 /// the helper helps distribute these colors over a gradient based upon the SkyTimeSettings
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Resource)]
 pub struct SkyColorsBuilder {
     pub sunset_color: StopsColors,
@@ -187,29 +193,30 @@ impl SkyColorsBuilder {
 ///! 4 colors for stops 1,2,3,4 (A: 4 color gradient)
 /// think of it as a color we want for a certain time:
 /// what "DAY_COLOR" or "NIGHT_COLOR" 4 color gradient we want
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Clone)]
 pub struct StopsColors {
-    pub stop0: Color32,
-    pub stop1: Color32,
-    pub stop2: Color32,
-    pub stop3: Color32,
+    pub stop0: [u8; 4],
+    pub stop1: [u8; 4],
+    pub stop2: [u8; 4],
+    pub stop3: [u8; 4],
 }
 
 impl StopsColors {
     pub fn new_splat(color: Color32) -> Self {
         Self {
-            stop0: color,
-            stop1: color,
-            stop2: color,
-            stop3: color,
+            stop0: color.to_array(),
+            stop1: color.to_array(),
+            stop2: color.to_array(),
+            stop3: color.to_array(),
         }
     }
     pub fn get_stop(&self, stop_pos: i32) -> Color32 {
         match stop_pos {
-            0 => self.stop0,
-            1 => self.stop1,
-            2 => self.stop2,
-            _ => self.stop3,
+            0 => Color32::from_rgb(self.stop0[0], self.stop0[1], self.stop0[2]),
+            1 => Color32::from_rgb(self.stop1[0], self.stop1[1], self.stop1[2]),
+            2 => Color32::from_rgb(self.stop2[0], self.stop2[1], self.stop2[2]),
+            _ => Color32::from_rgb(self.stop3[0], self.stop3[1], self.stop3[2]),
         }
     }
 }

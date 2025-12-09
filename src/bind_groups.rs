@@ -1,5 +1,8 @@
 use bevy::{prelude::*, render::render_resource::ShaderType};
 
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
 #[derive(Clone, Debug, Reflect, ShaderType)]
 pub struct GradientSettings {
     ///! the colors of sky
@@ -9,6 +12,8 @@ pub struct GradientSettings {
     ///! how many sky colors to make gradient of (max 4)
     pub num_stops: u32,
 }
+
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Debug, Reflect, ShaderType)]
 pub struct StarsSettings {
     ///! how fast to rotate sky per sec in radians
@@ -20,6 +25,21 @@ pub struct StarsSettings {
     pub mask_scale: f32,
     pub mask_threshold: f32,
     pub blink_variance_scale: f32,
+}
+
+impl Default for StarsSettings {
+    fn default() -> Self {
+        Self {
+            sky_rotation_speed: 0.01,
+            sample_scale: 9.0,
+            mask_scale: 1.0,
+            blink_variance_scale: 0.03,
+            mask_threshold: 0.4,
+            star_threshold: 0.9,
+            star_threshold_blink: 0.01,
+            blink_speed: 10.0,
+        }
+    }
 }
 
 #[derive(Clone, Debug, Reflect, ShaderType)]
@@ -41,6 +61,7 @@ impl Default for SunSettings {
     }
 }
 
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Debug, Reflect, ShaderType)]
 pub struct AuroraSettings {
     pub color_bottom: LinearRgba,
@@ -64,4 +85,32 @@ pub struct AuroraSettings {
     pub undersparkle_threshold: f32,
     pub undersparkle_height: f32,
     pub opacity_per_sample: f32,
+}
+
+impl Default for AuroraSettings {
+    fn default() -> Self {
+        Self {
+            color_bottom: LinearRgba::new(0.0, 1.0, 0.2, 1.0),
+            alpha: 0.7,
+            density: 0.05,
+            sharpness: 1.56,
+            num_samples: 40,
+            start_height: 3.1,
+            end_height: 4.8,
+            flow_scale: 0.002,
+            flow_strength: 4.3,
+            flow_speed: 0.005,
+            wiggle_scale: 0.03,
+            wiggle_strength: 1.05,
+            wiggle_speed: 0.1,
+            color_top: LinearRgba::new(0.0, 1.0, 0.8, 1.0),
+            undersparkle_color_primary: LinearRgba::new(0.0, 1.0, 0.0, 1.0),
+            undersparkle_color_secondary: LinearRgba::new(0.8, 0.2, 1.0, 1.0),
+            undersparkle_scale: 0.004,
+            undersparkle_speed: 0.02,
+            undersparkle_threshold: 0.3,
+            undersparkle_height: 0.3,
+            opacity_per_sample: 0.18,
+        }
+    }
 }

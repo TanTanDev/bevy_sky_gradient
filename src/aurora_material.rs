@@ -39,29 +39,7 @@ impl Material for AuroraMaterial {
 impl Default for AuroraMaterial {
     fn default() -> Self {
         AuroraMaterial {
-            aurora_settings: AuroraSettings {
-                color_bottom: LinearRgba::new(0.0, 1.0, 0.2, 1.0),
-                alpha: 0.7,
-                density: 0.05,
-                sharpness: 1.56,
-                num_samples: 40,
-                start_height: 3.1,
-                end_height: 4.8,
-                flow_scale: 0.002,
-                flow_strength: 4.3,
-                flow_speed: 0.005,
-                wiggle_scale: 0.03,
-                wiggle_strength: 1.05,
-                wiggle_speed: 0.1,
-                color_top: LinearRgba::new(0.0, 1.0, 0.8, 1.0),
-                undersparkle_color_primary: LinearRgba::new(0.0, 1.0, 0.0, 1.0),
-                undersparkle_color_secondary: LinearRgba::new(0.8, 0.2, 1.0, 1.0),
-                undersparkle_scale: 0.004,
-                undersparkle_speed: 0.02,
-                undersparkle_threshold: 0.3,
-                undersparkle_height: 0.3,
-                opacity_per_sample: 0.18,
-            },
+            aurora_settings: AuroraSettings::default(),
             noise3_image: Handle::default(),
         }
     }

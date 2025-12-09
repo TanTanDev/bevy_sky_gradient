@@ -10,6 +10,7 @@ use crate::{
     cycle::SkyCyclePlugin,
     gradient::GradientDriverPlugin,
     noise::{NoiseHandles, NoisePlugin, NoiseSettings},
+    presets::SkyPresetPlugin,
     sky_material::FullSkyMaterial,
     sun::SunDriverPlugin,
     utils,
@@ -21,6 +22,7 @@ use crate::{
 pub struct SkyPluginBuilder {
     pub spawn_default_skybox: bool,
     pub noise: NoisePlugin,
+    pub use_preset_plugin: bool,
     pub aurora: Option<AuroraPlugin>,
     pub cycle: Option<SkyCyclePlugin>,
     pub sun_driver: Option<SunDriverPlugin>,
@@ -42,6 +44,7 @@ impl SkyPluginBuilder {
             cycle: None,
             sun_driver: None,
             gradient_driver: None,
+            use_preset_plugin: false,
         }
     }
 
@@ -53,6 +56,7 @@ impl SkyPluginBuilder {
             cycle: Some(SkyCyclePlugin::default()),
             sun_driver: Some(SunDriverPlugin::default()),
             gradient_driver: Some(GradientDriverPlugin::default()),
+            use_preset_plugin: true,
         }
     }
 
@@ -70,6 +74,16 @@ impl SkyPluginBuilder {
 
     pub fn with_aurora(mut self) -> Self {
         self.aurora = Some(AuroraPlugin::default());
+        self
+    }
+
+    pub fn with_presets(mut self) -> Self {
+        self.use_preset_plugin = true;
+        self
+    }
+
+    pub fn set_presets(mut self, use_presets_plugin: bool) -> Self {
+        self.use_preset_plugin = use_presets_plugin;
         self
     }
 
@@ -133,6 +147,7 @@ impl SkyPlugin {
 impl Plugin for SkyPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(self.sky_builder.noise.clone());
+        app.add_plugins(SkyPresetPlugin);
         if let Some(aurora_plugin) = &self.sky_builder.aurora {
             app.add_plugins(aurora_plugin.clone());
         }

@@ -144,6 +144,8 @@ pub fn update_noise_textures(
     #[cfg(feature = "serde")]
     {
         if noise_settings.cache_textures_locally {
+            use crate::utils::path_relative_to_bevy_exe;
+
             let file_name = texture_file_name(noise_size, voronoi_size);
 
             let fs_file_path = format!("assets/noise/{}", file_name);
@@ -422,14 +424,9 @@ impl AssetLoader for NoiseTextureAssetLoader {
 }
 
 #[cfg(feature = "serde")]
-fn path_relative_to_bevy_exe(path: &str) -> std::path::PathBuf {
-    let current_dir = bevy::asset::io::file::FileAssetReader::get_base_path();
-    let new_path = current_dir.join(path);
-    new_path
-}
-
-#[cfg(feature = "serde")]
 pub fn save_noise(dir: &str, file_name: &str, asset: &NoiseTextureAsset) {
+    use crate::utils::path_relative_to_bevy_exe;
+
     let path = path_relative_to_bevy_exe(dir);
     if let Err(err) = std::fs::create_dir_all(&path) {
         error!(
