@@ -8,5 +8,6 @@ pub mod noise;
 pub mod plugin;
 pub mod presets;
 pub mod sky_material;
+pub mod sky_texture;
 pub mod sun;
 pub mod utils;

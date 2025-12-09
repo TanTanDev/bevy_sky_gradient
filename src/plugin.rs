@@ -12,6 +12,7 @@ use crate::{
     noise::{NoiseHandles, NoisePlugin, NoiseSettings},
     presets::SkyPresetPlugin,
     sky_material::FullSkyMaterial,
+    sky_texture::{SkyTexturePlugin, SkyTexturePluginSettings},
     sun::SunDriverPlugin,
     utils,
 };
@@ -21,8 +22,11 @@ use crate::{
 ///! then you can skip that plugin and implement your own.
 pub struct SkyPluginBuilder {
     pub spawn_default_skybox: bool,
-    pub noise: NoisePlugin,
+    ///! if enabled, the full sky is rendered to a texture
+    ///! usefull if you need to sample the sky for a fog effect for example
+    pub render_sky_to_texture: bool,
     pub use_preset_plugin: bool,
+    pub noise: NoisePlugin,
     pub aurora: Option<AuroraPlugin>,
     pub cycle: Option<SkyCyclePlugin>,
     pub sun_driver: Option<SunDriverPlugin>,
@@ -45,6 +49,7 @@ impl SkyPluginBuilder {
             sun_driver: None,
             gradient_driver: None,
             use_preset_plugin: false,
+            render_sky_to_texture: false,
         }
     }
 
@@ -57,11 +62,22 @@ impl SkyPluginBuilder {
             sun_driver: Some(SunDriverPlugin::default()),
             gradient_driver: Some(GradientDriverPlugin::default()),
             use_preset_plugin: true,
+            render_sky_to_texture: true,
         }
     }
 
     pub fn set_spawn_default_skybox(mut self, spawn_default_skybox: bool) -> Self {
         self.spawn_default_skybox = spawn_default_skybox;
+        self
+    }
+
+    pub fn with_render_sky_to_texture(mut self) -> Self {
+        self.render_sky_to_texture = true;
+        self
+    }
+
+    pub fn set_render_sky_to_texture(mut self, render_sky_to_texture: bool) -> Self {
+        self.render_sky_to_texture = render_sky_to_texture;
         self
     }
 
@@ -148,6 +164,11 @@ impl Plugin for SkyPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(self.sky_builder.noise.clone());
         app.add_plugins(SkyPresetPlugin);
+
+        if self.sky_builder.render_sky_to_texture {
+            app.add_plugins(SkyTexturePlugin::default());
+        }
+
         if let Some(aurora_plugin) = &self.sky_builder.aurora {
             app.add_plugins(aurora_plugin.clone());
         }
@@ -203,10 +224,10 @@ fn spawn_default_skybox(
     mut sky_materials: ResMut<Assets<FullSkyMaterial>>,
     noise_handles: Res<NoiseHandles>,
     aurora_handles: Res<AuroraTextureHandle>,
+    sky_texture_plugin_settings: Option<Res<SkyTexturePluginSettings>>,
 ) {
-    commands.spawn((
+    let mut skybox_commands = commands.spawn((
         Name::new("sky_gradient_skybox"),
-        SkyboxMagnetTag,
         Mesh3d(meshes.add(utils::default_sky_mesh())),
         MeshMaterial3d(sky_materials.add(FullSkyMaterial {
             noise3_image: noise_handles.noise3.clone(),
@@ -215,6 +236,9 @@ fn spawn_default_skybox(
             ..default()
         })),
     ));
+    if let Some(settings) = sky_texture_plugin_settings {
+        skybox_commands.insert(settings.sky_render_layer.clone());
+    }
 }
 
 // aurora texture is defined by sky, and the aurora render into it. it needs to be defined by the sky plugin

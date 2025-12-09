@@ -7,7 +7,7 @@ use bevy::{
 use crate::{
     aurora_material::AuroraMaterial,
     noise::{NoiseHandles, setup_noise_texture},
-    plugin::{AuroraTextureHandle, spawn_aurora_texture},
+    plugin::{AuroraTextureHandle, SkyboxMagnetTag, spawn_aurora_texture},
     utils,
 };
 
@@ -22,6 +22,7 @@ pub struct AuroraSettings {
     pub render_texture_percent: f32,
     ///! what render layer the aurora will render on
     pub camera_render_layers: RenderLayers,
+    pub camera_order: isize,
 }
 
 impl Default for AuroraSettings {
@@ -29,6 +30,7 @@ impl Default for AuroraSettings {
         Self {
             render_texture_percent: 0.33,
             camera_render_layers: RenderLayers::layer(7),
+            camera_order: -3,
         }
     }
 }
@@ -64,15 +66,15 @@ impl Plugin for AuroraPlugin {
 }
 
 fn aurora_follow_camera(
-    primary_cameras: Query<(&Transform, &Camera, &Projection), Without<AuroraCameraTag>>,
+    primary_cameras: Query<
+        (&Transform, &Camera, &Projection),
+        (Without<AuroraCameraTag>, With<SkyboxMagnetTag>),
+    >,
     mut aurora_cameras: Query<(&mut Transform, &Camera, &mut Projection), With<AuroraCameraTag>>,
     mut aurora_mesh: Query<&mut Transform, (Without<Camera>, With<MeshMaterial3d<AuroraMaterial>>)>,
 ) {
     // find active camera TODO: IDENTIFY THE CORRECT CAMERA BETTER
-    for (cam_tf, _camera, cam_proj) in primary_cameras
-        .iter()
-        .filter(|cam| cam.1.is_active && cam.1.order == 0)
-    {
+    if let Some((cam_tf, _camera, cam_proj)) = primary_cameras.iter().next() {
         for (mut aurora_tf, _cam, mut aurora_projection) in aurora_cameras.iter_mut() {
             // ensure same projection
             *aurora_projection = cam_proj.clone();
@@ -156,8 +158,7 @@ fn spawn_aurora_skybox(
         Camera3d::default(),
         AuroraCameraTag,
         Camera {
-            // render aurora before the "main pass" camera
-            order: -1,
+            order: aurora_settings.camera_order,
             target: aurora_texture_handle.render_target.clone().into(),
             clear_color: ClearColorConfig::Custom(Color::NONE),
             ..default()
