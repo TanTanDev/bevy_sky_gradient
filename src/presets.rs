@@ -54,6 +54,7 @@ pub const DEFAULT_SKY_COLORS_BUILDER: SkyColorsBuilder = SkyColorsBuilder {
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Default)]
 pub struct SkyPreset {
+    pub gradient_bind_group: Option<crate::bind_groups::GradientBindGroup>,
     pub aurora_settings: Option<crate::bind_groups::AuroraBindGroup>,
     pub sun_settings: Option<SunSettings>,
     pub sky_colors_builder: Option<SkyColorsBuilder>,

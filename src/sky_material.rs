@@ -1,19 +1,17 @@
 use bevy::prelude::*;
 use bevy::render::render_resource::{AsBindGroup, CompareFunction, ShaderRef};
 
-use crate::bind_groups::{GradientBindGroup, StarsBindGroup, SunBindGroup};
+use crate::bind_groups::{StarsBindGroup, SunBindGroup};
 
 #[derive(Asset, AsBindGroup, Reflect, Debug, Clone)]
 pub struct FullSkyMaterial {
     #[uniform(0)]
-    pub gradient_settings: crate::bind_groups::GradientBindGroup,
-    #[uniform(1)]
     pub sun: crate::bind_groups::SunBindGroup,
-    #[uniform(2)]
+    #[uniform(1)]
     pub stars: crate::bind_groups::StarsBindGroup,
     ///! auto set. 0 = NO night, 1 = FULL night
     ///! a full night cycle will go from 0 -> 1 -> 0
-    #[uniform(3)]
+    #[uniform(2)]
     pub night_time_distance: f32,
     ///! when in the night time to show the stars
     ///! x: when to start showing star
@@ -21,14 +19,14 @@ pub struct FullSkyMaterial {
     ///! example: (0.0, 0.1).
     ///! 0.0: start showing sky immediately when sunset begins
     ///! 0.1: sky brightness is maxed out 10% into the night
-    #[uniform(4)]
+    #[uniform(3)]
     pub night_visibility_range: Vec2,
 
-    #[uniform(5)]
+    #[uniform(4)]
     pub feature_stars_enabled: i32,
-    #[uniform(6)]
+    #[uniform(5)]
     pub feature_sun_enabled: i32,
-    #[uniform(7)]
+    #[uniform(6)]
     pub feature_aurora_enabled: i32,
 
     // noise
@@ -42,6 +40,9 @@ pub struct FullSkyMaterial {
     #[texture(14, dimension = "2d")]
     #[sampler(15)]
     pub aurora_image: Handle<Image>,
+    #[texture(16, dimension = "2d")]
+    #[sampler(17)]
+    pub gradient_image: Handle<Image>,
 }
 
 impl Material for FullSkyMaterial {
@@ -69,18 +70,8 @@ impl Material for FullSkyMaterial {
 
 impl Default for FullSkyMaterial {
     fn default() -> Self {
-        let color_stops = [
-            Vec4::new(0.2, 0.3, 0.6, 1.0),
-            Vec4::new(0.4, 0.5, 1.0, 1.0),
-            Vec4::new(0.35, 0.6, 0.8, 1.0),
-            Vec4::new(0.5, 0.7, 1.0, 1.0),
-        ];
         FullSkyMaterial {
-            gradient_settings: GradientBindGroup {
-                color_stops,
-                positions: Vec4::new(0.38, 0.47, 0.61, 1.0),
-                num_stops: 4,
-            },
+            gradient_image: Handle::default(),
             sun: SunBindGroup {
                 sun_dir: Vec3::new(0.0, 0.1, -1.0),
                 sun_color: Vec4::new(1.0, 1.0, 0.5, 1.0),

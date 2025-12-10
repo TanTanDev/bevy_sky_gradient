@@ -19,6 +19,9 @@ pub const STARS_SHADER_HANDLE: Handle<Shader> =
 pub const NOISE_SHADER_PATH: &str = "shaders/noise.wgsl";
 pub const NOISE_SHADER_HANDLE: Handle<Shader> =
     weak_handle!("1a3d3ae1-15d3-42be-9e03-2131b0e5c2fe");
+pub const FULL_GRADIENT_SHADER_PATH: &str = "shaders/full_gradient.wgsl";
+pub const FULL_GRADIENT_SHADER_HANDLE: Handle<Shader> =
+    weak_handle!("1a3d3ae1-15d3-42be-9e03-2131b0e3c1ef");
 
 use rust_embed::RustEmbed;
 #[derive(RustEmbed)]
@@ -53,4 +56,9 @@ pub fn initialize_shaders(mut shaders: ResMut<Assets<Shader>>) {
     add_shader(&mut shaders, SUN_SHADER_HANDLE, SUN_SHADER_PATH);
     add_shader(&mut shaders, STARS_SHADER_HANDLE, STARS_SHADER_PATH);
     add_shader(&mut shaders, NOISE_SHADER_HANDLE, NOISE_SHADER_PATH);
+    add_shader(
+        &mut shaders,
+        FULL_GRADIENT_SHADER_HANDLE,
+        FULL_GRADIENT_SHADER_PATH,
+    );
 }

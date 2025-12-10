@@ -58,7 +58,7 @@ impl Default for SkyTexturePlugin {
 
 ///! holds the quad where we render the sky
 #[derive(Component)]
-pub struct FullSkyQuadTag;
+pub struct FullSkySpriteTag;
 
 impl Plugin for SkyTexturePlugin {
     fn build(&self, app: &mut App) {
@@ -111,18 +111,6 @@ pub fn spawn_full_sky_texture(
         TextureUsages::TEXTURE_BINDING | TextureUsages::COPY_DST | TextureUsages::RENDER_ATTACHMENT;
 
     texture_handle.render_target = images.add(sky_image);
-    info!("spawned the sky render target");
-    commands.spawn((
-        ImageNode {
-            image: texture_handle.render_target.clone(),
-            ..default()
-        },
-        Node {
-            width: Val::Px(100.0),
-            height: Val::Px(100.0),
-            ..default()
-        },
-    ));
 }
 
 // System to resize the full sky texture when the window changes
@@ -196,8 +184,8 @@ fn spawn_full_sky_screen_quad(
     settings: Res<SkyTexturePluginSettings>,
 ) {
     commands.spawn((
-        Name::new("FullSky_ScreenQuad"),
-        FullSkyQuadTag,
+        Name::new("sky_screen_sprite"),
+        FullSkySpriteTag,
         Sprite {
             image: full_sky_handle.render_target.clone(),
             custom_size: Some(vec2(1.0, 1.0)),

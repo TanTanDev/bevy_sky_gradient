@@ -157,6 +157,7 @@ fn edit_ui(mut world: &mut World) {
 
 #[cfg(feature = "serde")]
 fn show_save_load_preset_uis(world: &mut World, egui_context: &mut EguiContext) {
+    use bevy_sky_gradient::gradient::FullGradientMaterial;
     use bevy_sky_gradient::gradient::SkyColorsBuilder;
     use bevy_sky_gradient::presets::{ApplyPresetEvent, SkyPreset};
     use bevy_sky_gradient::utils::path_relative_to_bevy_exe;
@@ -178,6 +179,10 @@ fn show_save_load_preset_uis(world: &mut World, egui_context: &mut EguiContext) 
             // fetch the bind group from the aurora
             let all_aurora_material = world.get_resource::<Assets<AuroraMaterial>>().unwrap();
             let current_aurora_material = all_aurora_material.iter().next().unwrap().1;
+            let all_gradient_material = world
+                .get_resource::<Assets<FullGradientMaterial>>()
+                .unwrap();
+            let current_gradient_material = all_gradient_material.iter().next().unwrap().1;
 
             let all_sky_materials = world.get_resource::<Assets<FullSkyMaterial>>().unwrap();
             let current_sky_material = all_sky_materials.iter().next().unwrap().1;
@@ -190,6 +195,7 @@ fn show_save_load_preset_uis(world: &mut World, egui_context: &mut EguiContext) 
                 sun_settings: Some(sun_settings.clone()),
                 sky_colors_builder: Some(sky_colors_builder.clone()),
                 stars: Some(current_sky_material.stars.clone()),
+                gradient_bind_group: Some(current_gradient_material.gradient_bind_group.clone()),
             };
             let sky_preset = ron::ser::to_string_pretty(&sky_preset, PrettyConfig::default());
             let sky_preset = sky_preset.unwrap();

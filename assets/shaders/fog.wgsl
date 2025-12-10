@@ -4,16 +4,6 @@
     forward_io::VertexOutput,
 }
 
-
-// #import bevy_pbr::{
-//     mesh_bindings::mesh,
-//     mesh_functions,
-//     skinning,
-//     morph::morph,
-//     forward_io::{Vertex, VertexOutput},
-//     view_transformations::position_world_to_clip,
-// }
-
 #import bevy_pbr::mesh_view_bindings::globals;
 #import bevy_pbr::mesh_functions::{get_world_from_local, mesh_position_local_to_clip}
 
@@ -22,12 +12,6 @@ struct FogSettings {
     distance_start: f32,
     distance_end: f32,
 }
-
-
-// struct VertexOutput {
-//     @builtin(position) frag_pos: vec4<f32>,
-//     @location(0) world_dir: vec3<f32>,
-// };
 
 @group(2) @binding(0)
 var<uniform> fog_settings: FogSettings;

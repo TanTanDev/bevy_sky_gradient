@@ -1,5 +1,4 @@
 use bevy::{
-    color::palettes::css::GREEN,
     prelude::*,
     render::{
         render_resource::{AsBindGroup, ShaderRef, ShaderType},
@@ -12,10 +11,10 @@ use bevy_inspector_egui::{
     quick::WorldInspectorPlugin,
 };
 use bevy_sky_gradient::{
-    plugin::{SkyPlugin, SkyboxMagnetTag},
+    plugin::{GradientTextureHandle, SkyPlugin, SkyboxMagnetTag},
     sky_texture::FullSkyTextureHandle,
 };
-use rand::{Rng, thread_rng};
+use rand::Rng;
 
 // this example illustrates, how you can correctly blend the skycolor into your shaders
 // by rendering the sky to a texture, then sampling that in your custom shader.
@@ -37,6 +36,7 @@ fn setup(
     // mut materials: ResMut<Assets<StandardMaterial>>,
     mut fog_materials: ResMut<Assets<FogMaterial>>,
     sky_texture: Res<FullSkyTextureHandle>,
+    gradient_texture: Res<GradientTextureHandle>,
 ) {
     // circular base
     commands.spawn((
@@ -46,7 +46,7 @@ fn setup(
                 color: vec3(0.0, 1.0, 0.0),
                 ..default()
             },
-            sky_texture: sky_texture.render_target.clone(),
+            sky_texture: gradient_texture.render_target.clone(),
         })),
         Transform::from_rotation(Quat::from_rotation_x(-std::f32::consts::FRAC_PI_2)),
     ));
@@ -64,24 +64,11 @@ fn setup(
                     color: vec3(1.0, 0.0, 0.0),
                     ..default()
                 },
-                sky_texture: sky_texture.render_target.clone(),
+                sky_texture: gradient_texture.render_target.clone(),
             })),
             Transform::from_xyz(x, scale * 0.5, z).with_scale(Vec3::splat(scale)),
         ));
     }
-
-    commands.spawn((
-        ImageNode {
-            image: sky_texture.render_target.clone(),
-            ..default()
-        },
-        Node {
-            align_self: AlignSelf::End,
-            width: Val::Px(100.0),
-            height: Val::Px(100.0),
-            ..default()
-        },
-    ));
 
     // camera
     commands.spawn((

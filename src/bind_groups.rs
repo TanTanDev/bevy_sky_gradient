@@ -3,6 +3,7 @@ use bevy::{prelude::*, render::render_resource::ShaderType};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Debug, Reflect, ShaderType)]
 pub struct GradientBindGroup {
     ///! the colors of sky
@@ -11,6 +12,22 @@ pub struct GradientBindGroup {
     pub positions: Vec4,
     ///! how many sky colors to make gradient of (max 4)
     pub num_stops: u32,
+}
+
+impl Default for GradientBindGroup {
+    fn default() -> Self {
+        let color_stops = [
+            Vec4::new(0.2, 0.3, 0.6, 1.0),
+            Vec4::new(0.4, 0.5, 1.0, 1.0),
+            Vec4::new(0.35, 0.6, 0.8, 1.0),
+            Vec4::new(0.5, 0.7, 1.0, 1.0),
+        ];
+        GradientBindGroup {
+            color_stops,
+            positions: Vec4::new(0.38, 0.47, 0.61, 1.0),
+            num_stops: 4,
+        }
+    }
 }
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]

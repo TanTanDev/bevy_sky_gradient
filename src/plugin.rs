@@ -2,13 +2,17 @@ use bevy::{
     asset::RenderAssetUsages,
     image::ImageSampler,
     prelude::*,
-    render::render_resource::{Extent3d, TextureDimension, TextureFormat, TextureUsages},
+    render::{
+        render_resource::{Extent3d, TextureDimension, TextureFormat, TextureUsages},
+        view::RenderLayers,
+    },
 };
 
 use crate::{
     aurora::AuroraPlugin,
+    bind_groups::GradientBindGroup,
     cycle::SkyCyclePlugin,
-    gradient::GradientDriverPlugin,
+    gradient::{FullGradientMaterial, GradientDriverPlugin},
     noise::{NoiseHandles, NoisePlugin, NoiseSettings},
     presets::SkyPresetPlugin,
     sky_material::FullSkyMaterial,
@@ -17,11 +21,28 @@ use crate::{
     utils,
 };
 
+#[derive(Clone, Resource)]
+pub struct SkySettings {
+    pub camera_gradient_order: isize,
+    pub skybox_gradient_render_layer: RenderLayers,
+    pub spawn_default_skybox: bool,
+}
+
+impl Default for SkySettings {
+    fn default() -> Self {
+        Self {
+            camera_gradient_order: 3,
+            spawn_default_skybox: true,
+            skybox_gradient_render_layer: RenderLayers::layer(6),
+        }
+    }
+}
+
 ///! controlls what features you want.  
 ///! you might not want to use the default Cycle/SunDriver/GradientDriver/Aurora for example
 ///! then you can skip that plugin and implement your own.
 pub struct SkyPluginBuilder {
-    pub spawn_default_skybox: bool,
+    pub settings: SkySettings,
     ///! if enabled, the full sky is rendered to a texture
     ///! usefull if you need to sample the sky for a fog effect for example
     pub render_sky_to_texture: bool,
@@ -42,7 +63,7 @@ impl Default for SkyPluginBuilder {
 impl SkyPluginBuilder {
     pub fn no_features() -> Self {
         Self {
-            spawn_default_skybox: true,
+            settings: SkySettings::default(),
             noise: NoisePlugin::default(),
             aurora: None,
             cycle: None,
@@ -55,7 +76,7 @@ impl SkyPluginBuilder {
 
     pub fn all_features() -> Self {
         Self {
-            spawn_default_skybox: true,
+            settings: SkySettings::default(),
             noise: NoisePlugin::default(),
             aurora: Some(AuroraPlugin::default()),
             cycle: Some(SkyCyclePlugin::default()),
@@ -67,7 +88,7 @@ impl SkyPluginBuilder {
     }
 
     pub fn set_spawn_default_skybox(mut self, spawn_default_skybox: bool) -> Self {
-        self.spawn_default_skybox = spawn_default_skybox;
+        self.settings.spawn_default_skybox = spawn_default_skybox;
         self
     }
 
@@ -83,7 +104,8 @@ impl SkyPluginBuilder {
 
     pub fn build(self) -> SkyPlugin {
         SkyPlugin {
-            spawn_default_skybox: self.spawn_default_skybox,
+            // spawn_default_skybox: self.settings.spawn_default_skybox,
+            // spawn_default_skybox_gradient: self.settings.spawn_default_skybox_gradient,
             sky_builder: self,
         }
     }
@@ -147,7 +169,8 @@ impl SkyPluginBuilder {
 ///! sets up all you need to show a gradient skybox
 pub struct SkyPlugin {
     ///! if true, an entity skybox will spawn
-    pub spawn_default_skybox: bool,
+    // pub spawn_default_skybox: bool,
+    // pub spawn_default_skybox_gradient: bool,
     pub sky_builder: SkyPluginBuilder,
 }
 
@@ -162,6 +185,7 @@ impl SkyPlugin {
 
 impl Plugin for SkyPlugin {
     fn build(&self, app: &mut App) {
+        app.insert_resource(self.sky_builder.settings.clone());
         app.add_plugins(self.sky_builder.noise.clone());
         app.add_plugins(SkyPresetPlugin);
 
@@ -191,16 +215,22 @@ impl Plugin for SkyPlugin {
         app.insert_resource(AuroraTextureHandle {
             render_target: Handle::default(),
         });
+        app.insert_resource(GradientTextureHandle {
+            render_target: Handle::default(),
+        });
         app.add_systems(PreStartup, spawn_aurora_texture);
+        app.add_systems(PreStartup, spawn_gradient_texture);
 
         app.add_systems(Startup, crate::assets::initialize_shaders);
         app.add_plugins(MaterialPlugin::<FullSkyMaterial>::default());
-        if self.spawn_default_skybox {
+        if self.sky_builder.settings.spawn_default_skybox {
             app.add_systems(Startup, spawn_default_skybox);
         }
+        app.add_systems(Startup, spawn_default_skybox_gradient);
+
         app.add_systems(
             PostUpdate,
-            (sky_follow_camera,).before(TransformSystem::TransformPropagate),
+            (sky_follow_camera, gradient_follow_camera).before(TransformSystem::TransformPropagate),
         );
     }
 }
@@ -208,7 +238,6 @@ impl Plugin for SkyPlugin {
 impl Default for SkyPlugin {
     fn default() -> Self {
         Self {
-            spawn_default_skybox: true,
             sky_builder: SkyPluginBuilder::default(),
         }
     }
@@ -224,6 +253,7 @@ fn spawn_default_skybox(
     mut sky_materials: ResMut<Assets<FullSkyMaterial>>,
     noise_handles: Res<NoiseHandles>,
     aurora_handles: Res<AuroraTextureHandle>,
+    gradient_texture_handle: Res<GradientTextureHandle>,
     sky_texture_plugin_settings: Option<Res<SkyTexturePluginSettings>>,
 ) {
     let mut skybox_commands = commands.spawn((
@@ -233,12 +263,46 @@ fn spawn_default_skybox(
             noise3_image: noise_handles.noise3.clone(),
             voronoi3_image: noise_handles.voronoi3.clone(),
             aurora_image: aurora_handles.render_target.clone(),
+            gradient_image: gradient_texture_handle.render_target.clone(),
             ..default()
         })),
     ));
     if let Some(settings) = sky_texture_plugin_settings {
         skybox_commands.insert(settings.sky_render_layer.clone());
     }
+}
+#[derive(Component)]
+pub struct GradientCameraTag;
+
+fn spawn_default_skybox_gradient(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut gradient_materials: ResMut<Assets<FullGradientMaterial>>,
+    gradient_texture_handle: Res<GradientTextureHandle>,
+    sky_settings: Res<SkySettings>,
+) {
+    commands.spawn((
+        Name::new("sky_skybox_full_gradient"),
+        Mesh3d(meshes.add(utils::default_sky_mesh())),
+        MeshMaterial3d(gradient_materials.add(FullGradientMaterial {
+            gradient_bind_group: GradientBindGroup::default(),
+        })),
+        sky_settings.skybox_gradient_render_layer.clone(),
+    ));
+
+    commands.spawn((
+        Name::new("camera_gradient"),
+        Camera3d::default(),
+        GradientCameraTag,
+        Camera {
+            order: sky_settings.camera_gradient_order,
+            target: gradient_texture_handle.render_target.clone().into(),
+            clear_color: ClearColorConfig::Custom(Color::NONE),
+            ..default()
+        },
+        Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)).looking_at(Vec3::ZERO, Vec3::Y),
+        sky_settings.skybox_gradient_render_layer.clone(),
+    ));
 }
 
 // aurora texture is defined by sky, and the aurora render into it. it needs to be defined by the sky plugin
@@ -251,6 +315,36 @@ pub struct AuroraTextureHandle {
 pub fn spawn_aurora_texture(
     mut images: ResMut<Assets<Image>>,
     mut aurora_texture_handle: ResMut<AuroraTextureHandle>,
+) {
+    let size = Extent3d {
+        width: 2,
+        height: 2,
+        ..default()
+    };
+
+    let mut aurora_image = Image::new_fill(
+        size,
+        TextureDimension::D2,
+        &[0, 0, 0, 0],
+        TextureFormat::Bgra8UnormSrgb,
+        RenderAssetUsages::default(),
+    );
+    aurora_image.sampler = ImageSampler::linear();
+    aurora_image.texture_descriptor.usage =
+        TextureUsages::TEXTURE_BINDING | TextureUsages::COPY_DST | TextureUsages::RENDER_ATTACHMENT;
+
+    let aurora_image_handle = images.add(aurora_image);
+    aurora_texture_handle.render_target = aurora_image_handle;
+}
+
+#[derive(Resource)]
+pub struct GradientTextureHandle {
+    pub render_target: Handle<Image>,
+}
+
+pub fn spawn_gradient_texture(
+    mut images: ResMut<Assets<Image>>,
+    mut aurora_texture_handle: ResMut<GradientTextureHandle>,
 ) {
     let size = Extent3d {
         width: 2,
@@ -294,6 +388,29 @@ fn sky_follow_camera(
         if !*warned_once {
             warn!("SkyPlugin: MORE THAN 1 CAMERA WITH SkyBoxMagnetTag");
             *warned_once = true;
+        }
+    }
+}
+
+fn gradient_follow_camera(
+    primary_cameras: Query<
+        (&Transform, &Camera, &Projection),
+        (Without<GradientCameraTag>, With<SkyboxMagnetTag>),
+    >,
+    mut gradient_camera: Query<(&mut Transform, &Camera, &mut Projection), With<GradientCameraTag>>,
+    mut gradient_mesh: Query<
+        &mut Transform,
+        (Without<Camera>, With<MeshMaterial3d<FullGradientMaterial>>),
+    >,
+) {
+    if let Some((cam_tf, _camera, cam_proj)) = primary_cameras.iter().next() {
+        for (mut aurora_tf, _cam, mut aurora_projection) in gradient_camera.iter_mut() {
+            // ensure same projection
+            *aurora_projection = cam_proj.clone();
+            *aurora_tf = *cam_tf;
+            for mut aurora_tf in gradient_mesh.iter_mut() {
+                aurora_tf.translation = cam_tf.translation;
+            }
         }
     }
 }
