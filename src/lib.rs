@@ -11,3 +11,7 @@ pub mod sky_material;
 pub mod sky_texture;
 pub mod sun;
 pub mod utils;
+
+pub mod prelude {
+    pub use crate::plugin::SkyPlugin;
+}
