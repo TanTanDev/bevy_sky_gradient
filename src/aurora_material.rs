@@ -16,8 +16,10 @@ pub struct AuroraMaterial {
 impl Material for AuroraMaterial {
     fn vertex_shader() -> ShaderRef {
         crate::assets::FULL_AURORA_SHADER_HANDLE.into()
+        // "embedded://bevy_sky_gradient/../assets/shaders/full_aurora.wgsl".into()
     }
     fn fragment_shader() -> ShaderRef {
+        // "embedded://bevy_sky_gradient/../assets/shaders/full_aurora.wgsl".into()
         crate::assets::FULL_AURORA_SHADER_HANDLE.into()
     }
 

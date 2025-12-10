@@ -9,7 +9,6 @@ serde = ["dep:serde", "dep:ron", "dep:bincode"]
 
 [dependencies]
 bevy = "0.16"
-rust-embed = "8" # to embed assets like .wgsl
 thiserror = "2"
 
 # optional serialization

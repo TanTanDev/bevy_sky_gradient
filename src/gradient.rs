@@ -297,10 +297,12 @@ pub struct FullGradientMaterial {
 
 impl Material for FullGradientMaterial {
     fn vertex_shader() -> ShaderRef {
+        // "embedded://bevy_sky_gradient/../assets/shaders/full_gradient.wgsl".into()
         crate::assets::FULL_GRADIENT_SHADER_HANDLE.into()
     }
     fn fragment_shader() -> ShaderRef {
         crate::assets::FULL_GRADIENT_SHADER_HANDLE.into()
+        // "embedded://bevy_sky_gradient/../assets/shaders/full_gradient.wgsl".into()
     }
 
     fn specialize(

@@ -1,4 +1,4 @@
-#import "shaders/noise.wgsl"::{noise};
+#import "bevy_sky_gradient/shaders/noise.wgsl"::{noise};
 
 struct AuroraSettings {
     bottom_color: vec4<f32>, 

@@ -217,7 +217,8 @@ impl Plugin for SkyPlugin {
         app.add_systems(PreStartup, spawn_aurora_texture);
         app.add_systems(PreStartup, spawn_gradient_texture);
 
-        app.add_systems(Startup, crate::assets::initialize_shaders);
+        // app.add_systems(Startup, crate::assets::initialize_shaders);
+        app.add_plugins(crate::assets::SkyAssetsPlugin);
         app.add_plugins(MaterialPlugin::<FullSkyMaterial>::default());
         if self.sky_builder.settings.spawn_default_skybox {
             app.add_systems(Startup, spawn_default_skybox);

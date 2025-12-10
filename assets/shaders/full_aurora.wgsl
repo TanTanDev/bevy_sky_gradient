@@ -5,7 +5,7 @@
 #import bevy_pbr::mesh_view_bindings::globals;
 #import bevy_pbr::mesh_functions::{get_world_from_local, mesh_position_local_to_clip}
 
-#import "shaders/aurora.wgsl"::{AuroraSettings, aurora};
+#import "bevy_sky_gradient/shaders/aurora.wgsl"::{AuroraSettings, aurora};
 
 @group(2) @binding(0)
 var<uniform> aurora_settings: AuroraSettings;
