@@ -10,7 +10,6 @@ use serde::{Deserialize, Serialize};
 use crate::{
     cycle::{SkyTime, SkyTimeSettings},
     plugin::GradientTextureHandle,
-    sky_material::FullSkyMaterial,
 };
 
 ///! animates the sky gradients, REQUIRES CyclePlugin.

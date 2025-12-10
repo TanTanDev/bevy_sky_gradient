@@ -10,10 +10,7 @@ use bevy_inspector_egui::{
     bevy_egui::{EguiGlobalSettings, EguiPlugin, PrimaryEguiContext},
     quick::WorldInspectorPlugin,
 };
-use bevy_sky_gradient::{
-    plugin::{GradientTextureHandle, SkyPlugin, SkyboxMagnetTag},
-    sky_texture::FullSkyTextureHandle,
-};
+use bevy_sky_gradient::plugin::{GradientTextureHandle, SkyPlugin, SkyboxMagnetTag};
 use rand::Rng;
 
 // this example illustrates, how you can correctly blend the skycolor into your shaders
@@ -33,9 +30,7 @@ fn main() {
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    // mut materials: ResMut<Assets<StandardMaterial>>,
     mut fog_materials: ResMut<Assets<FogMaterial>>,
-    sky_texture: Res<FullSkyTextureHandle>,
     gradient_texture: Res<GradientTextureHandle>,
 ) {
     // circular base

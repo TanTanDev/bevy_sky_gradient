@@ -84,7 +84,6 @@ impl Plugin for SkyTexturePlugin {
 
 // System to spawn the full sky target texture at the start
 pub fn spawn_full_sky_texture(
-    mut commands: Commands,
     mut images: ResMut<Assets<Image>>,
     mut texture_handle: ResMut<FullSkyTextureHandle>,
     // Use the window to get an initial size, full-resolution is best for the sky.

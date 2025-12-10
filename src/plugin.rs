@@ -103,11 +103,7 @@ impl SkyPluginBuilder {
     }
 
     pub fn build(self) -> SkyPlugin {
-        SkyPlugin {
-            // spawn_default_skybox: self.settings.spawn_default_skybox,
-            // spawn_default_skybox_gradient: self.settings.spawn_default_skybox_gradient,
-            sky_builder: self,
-        }
+        SkyPlugin { sky_builder: self }
     }
 
     pub fn with_aurora(mut self) -> Self {
