@@ -150,7 +150,7 @@ fn spawn_full_sky_camera(
     full_sky_handle: Res<FullSkyTextureHandle>,
     settings: Res<SkyTexturePluginSettings>,
 ) {
-    // draw the sky to a texture
+    // draw the full sky to a texture, instead of drawing directly to screen
     commands.spawn((
         Name::new("camera_full_sky"),
         Camera3d::default(),

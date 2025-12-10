@@ -2,9 +2,9 @@ use bevy::{color::palettes::css::WHITE, pbr::light_consts::lux::AMBIENT_DAYLIGHT
 use bevy_flycam::{FlyCam, NoCameraPlayerPlugin};
 use bevy_sky_gradient::{
     cycle::{SkyCyclePlugin, SkyTime, SkyTimeSettings},
-    gradient::{GradientDriverPlugin, SkyColorsBuilder, StopsColors},
+    gradient::{FullGradientMaterial, GradientDriverPlugin, SkyColorsBuilder, StopsColors},
     noise::NoiseHandles,
-    plugin::{AuroraTextureHandle, SkyPlugin, SkyboxMagnetTag},
+    plugin::{AuroraTextureHandle, GradientTextureHandle, SkyPlugin, SkyboxMagnetTag},
     sky_material::FullSkyMaterial,
     sun::{SunDriverPlugin, SunDriverTag, SunSettings},
 };
@@ -68,6 +68,7 @@ fn setup(
     mut sky_materials: ResMut<Assets<FullSkyMaterial>>,
     noise_handles: Res<NoiseHandles>,
     aurora_handle: Res<AuroraTextureHandle>,
+    gradient_handle: Res<GradientTextureHandle>,
 ) {
     // MANUAL SKYBOX CREATION, using a cuboid mesh instead of Sphere, because we can.
     let mut mesh = Cuboid::from_length(1.0).mesh().build();
@@ -80,6 +81,7 @@ fn setup(
             noise3_image: noise_handles.noise3.clone(),
             voronoi3_image: noise_handles.voronoi3.clone(),
             aurora_image: aurora_handle.render_target.clone(),
+            gradient_image: gradient_handle.render_target.clone(),
             ..default()
         })),
     ));

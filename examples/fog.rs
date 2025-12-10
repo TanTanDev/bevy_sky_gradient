@@ -23,7 +23,12 @@ fn main() {
         .add_plugins(NoCameraPlayerPlugin)
         .add_plugins(MaterialPlugin::<FogMaterial>::default())
         .add_systems(Update, force_material_update)
-        .add_plugins(SkyPlugin::default())
+        .add_plugins(
+            SkyPlugin::builder_all_features()
+                // required to enable fog
+                .with_render_sky_to_texture()
+                .build(),
+        )
         .run();
 }
 
@@ -41,6 +46,7 @@ fn setup(
                 color: vec3(0.0, 1.0, 0.0),
                 ..default()
             },
+            // pass in the sky's gradient result
             sky_texture: gradient_texture.render_target.clone(),
         })),
         Transform::from_rotation(Quat::from_rotation_x(-std::f32::consts::FRAC_PI_2)),
@@ -59,6 +65,7 @@ fn setup(
                     color: vec3(1.0, 0.0, 0.0),
                     ..default()
                 },
+                // pass in the sky's gradient result
                 sky_texture: gradient_texture.render_target.clone(),
             })),
             Transform::from_xyz(x, scale * 0.5, z).with_scale(Vec3::splat(scale)),

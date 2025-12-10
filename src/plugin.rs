@@ -83,7 +83,7 @@ impl SkyPluginBuilder {
             sun_driver: Some(SunDriverPlugin::default()),
             gradient_driver: Some(GradientDriverPlugin::default()),
             use_preset_plugin: true,
-            render_sky_to_texture: true,
+            render_sky_to_texture: false,
         }
     }
 
@@ -97,32 +97,12 @@ impl SkyPluginBuilder {
         self
     }
 
-    pub fn set_render_sky_to_texture(mut self, render_sky_to_texture: bool) -> Self {
-        self.render_sky_to_texture = render_sky_to_texture;
-        self
-    }
-
     pub fn build(self) -> SkyPlugin {
         SkyPlugin { sky_builder: self }
     }
 
-    pub fn with_aurora(mut self) -> Self {
-        self.aurora = Some(AuroraPlugin::default());
-        self
-    }
-
-    pub fn with_presets(mut self) -> Self {
-        self.use_preset_plugin = true;
-        self
-    }
-
     pub fn set_presets(mut self, use_presets_plugin: bool) -> Self {
         self.use_preset_plugin = use_presets_plugin;
-        self
-    }
-
-    pub fn with_cycle(mut self) -> Self {
-        self.cycle = Some(SkyCyclePlugin::default());
         self
     }
 
