@@ -28,7 +28,7 @@ pub struct AuroraSettings {
 impl Default for AuroraSettings {
     fn default() -> Self {
         Self {
-            render_texture_percent: 0.33,
+            render_texture_percent: 0.25,
             camera_render_layers: RenderLayers::layer(7),
             camera_order: -3,
         }

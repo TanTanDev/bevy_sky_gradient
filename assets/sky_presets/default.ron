@@ -1,4 +1,9 @@
 (
+    gradient_bind_group: Some((
+        color_stops: ((0.0, 0.00044818036, 0.17572363, 1.0), (0.0070214868, 0.12070962, 0.3647059, 1.0), (0.0, 0.00567694, 0.4369748, 1.0), (0.011055112, 0.0, 0.17549954, 1.0)),
+        positions: (0.38, 0.47, 0.61, 1.0),
+        num_stops: 4,
+    )),
     aurora_settings: Some((
         color_bottom: (
             red: 0.0,
@@ -26,14 +31,14 @@
         ),
         undersparkle_color_primary: (
             red: 0.0,
-            green: 1.0,
+            green: 2.3,
             blue: 0.0,
             alpha: 1.0,
         ),
         undersparkle_color_secondary: (
-            red: 0.8,
+            red: 6.3,
             green: 0.2,
-            blue: 1.0,
+            blue: 4.3,
             alpha: 1.0,
         ),
         undersparkle_scale: 0.004,

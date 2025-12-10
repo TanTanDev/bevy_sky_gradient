@@ -30,7 +30,6 @@ fn fragment(in: VertexOutput) -> @location(0) vec4<f32> {
 
     let fog_color = sky_color_sample;
     
-    // let distance = length(in.world_position.xyz);
     let distance = length(in.world_position.xyz - view.world_position.xyz);
     let fog_factor = smoothstep(
         fog_settings.distance_start,
