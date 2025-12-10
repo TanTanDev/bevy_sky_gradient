@@ -15,6 +15,7 @@
         flow_scale: 0.002,
         flow_strength: 4.3,
         flow_speed: 0.005,
+        flow_x_speed: -0.6,
         wiggle_scale: 0.03,
         wiggle_strength: 1.05,
         wiggle_speed: 0.1,

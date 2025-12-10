@@ -11,6 +11,7 @@ struct AuroraSettings {
     flow_scale: f32, 
     flow_strength: f32, 
     flow_speed: f32, 
+    flow_x_speed: f32, 
     wiggle_scale: f32,
     wiggle_strength: f32,
     wiggle_speed: f32,
@@ -80,7 +81,7 @@ fn aurora(
             noise(n3_t, n3_s, vec3<f32>(w_wo.x, w_wo.y, 0.5 + wiggle_time + time_offset)));
         let wiggle = wiggle_noise * settings.wiggle_strength;
        
-        let warped_pos = world_pos + flow_dir * settings.flow_strength + wiggle;
+        let warped_pos = world_pos + flow_dir * settings.flow_strength + wiggle + settings.flow_x_speed * global_time;
         // Create 2 bands, one thicker, one less thick and spaced further away
         let large_bands = make_stripe(warped_pos.x * settings.density, 0.2);
         let smaller_bands = make_stripe(warped_pos.x * settings.density * 1.7, 0.1);
