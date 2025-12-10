@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     aurora_material::AuroraMaterial,
-    gradient::{SkyColorsBuilder, StopsColors},
+    gradient::{FullGradientMaterial, SkyColorsBuilder, StopsColors},
     sky_material::FullSkyMaterial,
     sun::SunSettings,
 };
@@ -79,8 +79,10 @@ pub fn handle_apply_preset_events(
     mut events: EventReader<ApplyPresetEvent>,
     skyboxes: Query<&mut MeshMaterial3d<FullSkyMaterial>>,
     auroras: Query<&mut MeshMaterial3d<AuroraMaterial>>,
+    gradient_handles: Query<&mut MeshMaterial3d<FullGradientMaterial>>,
     mut sky_materials: ResMut<Assets<FullSkyMaterial>>,
     mut auroras_materials: ResMut<Assets<AuroraMaterial>>,
+    mut gradient_materials: ResMut<Assets<FullGradientMaterial>>,
     mut sky_colors_builder_optional: Option<ResMut<SkyColorsBuilder>>,
     mut sun_settings_optional: Option<ResMut<SunSettings>>,
 ) {
@@ -106,13 +108,22 @@ pub fn handle_apply_preset_events(
             skybox_material.stars = star_settings.clone();
         }
 
-        if let Some(aurora_settings) = &event.sky_preset.aurora_settings {
+        if let Some(aurora_bind_group) = &event.sky_preset.aurora_settings {
             let aurora_material_handle =
                 auroras.single().expect("1 entity with SkyGradientMaterial");
             let aurora_material = auroras_materials
                 .get_mut(aurora_material_handle)
                 .expect("auroraMaterial");
-            aurora_material.aurora_settings = aurora_settings.clone();
+            aurora_material.aurora_settings = aurora_bind_group.clone();
+        }
+        if let Some(gradient_bind_group) = &event.sky_preset.gradient_bind_group {
+            let gradient_material_handle = gradient_handles
+                .single()
+                .expect("1 entity with FullGradientMaterial");
+            let gradient_material = gradient_materials
+                .get_mut(gradient_material_handle)
+                .expect("gradientMaterial");
+            gradient_material.gradient_bind_group = gradient_bind_group.clone();
         }
     }
 }

@@ -4,7 +4,7 @@ use bevy_sky_gradient::{
     aurora::AuroraSettings,
     aurora_material::AuroraMaterial,
     cycle::{SkyCyclePlugin, SkyTime, SkyTimeSettings},
-    gradient::{Gradient, SkyColors},
+    gradient::{FullGradientMaterial, Gradient, SkyColors},
     noise::NoiseSettings,
     plugin::{SkyPlugin, SkyboxMagnetTag},
     sky_material::FullSkyMaterial,
@@ -32,6 +32,7 @@ fn main() {
         // egui
         .add_plugins(EguiPlugin::default())
         .add_plugins(AssetInspectorPlugin::<FullSkyMaterial>::default())
+        .add_plugins(AssetInspectorPlugin::<FullGradientMaterial>::default())
         .add_plugins(AssetInspectorPlugin::<AuroraMaterial>::default())
         .add_plugins(ResourceInspectorPlugin::<AuroraSettings>::default())
         .add_plugins(ResourceInspectorPlugin::<NoiseSettings>::default())
