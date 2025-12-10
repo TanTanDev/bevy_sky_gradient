@@ -2,10 +2,8 @@ use bevy::prelude::*;
 
 use crate::sky_material::FullSkyMaterial;
 
-// cycle.rs has 2 plugins: SkyCyclePlugin and SunDriverPlugin
-
-///! this plugin controlls the colors of our skygradient
-///! through our SkyTime
+///! introduce a sky timer that our SunDriver+GradientDriver
+///! can use to animate the sky over time
 #[derive(Clone)]
 pub struct SkyCyclePlugin {
     pub sky_time_settings: SkyTimeSettings,

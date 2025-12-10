@@ -24,12 +24,12 @@ fn vertex(@location(0) position: vec3<f32>, @builtin(instance_index) vertin: u32
     return out;
 }
 
+// only render the gradient effect
 @fragment
 fn fragment(
     in: VertexOutput,
 ) -> @location(0) vec4<f32> {
     let view_dir = normalize(in.world_dir);
-    return  gradient(view_dir, gradient_settings);
+    return gradient(view_dir, gradient_settings);
 }
-
 

@@ -6,7 +6,6 @@ struct GradientSettings {
 
 fn gradient(view_dir: vec3<f32>, gradient_settings: GradientSettings) -> vec4<f32> {
     let t = clamp(view_dir.y * 0.5 + 0.5, 0.0, 1.0);
-    // GRADIENT
     var base_color: vec4<f32> = gradient_settings.color_stops[0];
     // if below first stop
     if (t <= gradient_settings.positions[0]) {

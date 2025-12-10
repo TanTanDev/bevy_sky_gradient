@@ -3,14 +3,12 @@
 struct StarsSettings {
     sky_rotation_speed: f32,
     sample_scale: f32,
-
-    star_threshold: f32, // 0.9
-    star_threshold_blink: f32, // 0.01
-    blink_speed: f32, // 10.0
-
-    mask_scale: f32, // 1.0
-    mask_threshold: f32, // 1.0
-    blink_variance_scale: f32, // 0.1
+    star_threshold: f32,
+    star_threshold_blink: f32,
+    blink_speed: f32,
+    mask_scale: f32,
+    mask_threshold: f32,
+    blink_variance_scale: f32,
 }
 
 fn stars(
@@ -27,9 +25,9 @@ fn stars(
     let c = cos(sky_rotation);
     let s = sin(sky_rotation);
     let rotation_matrix = mat3x3<f32>(
-        vec3<f32>(c,-s,0.0),// new x basis vector
-        vec3<f32>(s, c, 0.0),// new y basis vector
-        vec3<f32>(0.0,0.0,1.0),// new z basis vector
+        vec3<f32>(c,-s,0.0), // new x basis vector
+        vec3<f32>(s, c, 0.0), // new y basis vector
+        vec3<f32>(0.0,0.0,1.0), // new z basis vector
     );
     let offset_world_dir = rotation_matrix * view_dir;
 

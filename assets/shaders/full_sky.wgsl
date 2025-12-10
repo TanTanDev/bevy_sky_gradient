@@ -59,6 +59,7 @@ fn vertex(@location(0) position: vec3<f32>, @builtin(instance_index) vertin: u32
     return out;
 }
 
+// combines our gradient texture + calculate stars + aurora texture 
 @fragment
 fn fragment(
     in: VertexOutput,

@@ -9,7 +9,7 @@ use bevy_sky_gradient::{
     sun::{SunDriverPlugin, SunDriverTag, SunSettings},
 };
 
-// This example show how you can customize in depth
+// This example show how you can customize any aspect of the sky
 // here we manually spawn: skybox, and our sun light
 // we also configure the cycle timings (long night)
 fn main() {

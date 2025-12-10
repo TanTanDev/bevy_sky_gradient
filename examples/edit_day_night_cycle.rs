@@ -263,8 +263,8 @@ fn setup_egui_render_layer(
     ));
 }
 
+// helper to convert our Gradient, into egui_colorgradient
 use bevy_inspector_egui::egui::Color32;
-
 fn gradient_to_egui(gradient: Gradient) -> egui_colorgradient::Gradient {
     use egui_colorgradient::InterpolationMethod;
     let mut stops = Vec::with_capacity(4);

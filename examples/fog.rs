@@ -37,7 +37,7 @@ fn setup(
     commands.spawn((
         Mesh3d(meshes.add(Circle::new(90.0))),
         MeshMaterial3d(fog_materials.add(FogMaterial {
-            settings: FogSettings {
+            settings: FogBindGroup {
                 color: vec3(0.0, 1.0, 0.0),
                 ..default()
             },
@@ -55,7 +55,7 @@ fn setup(
         commands.spawn((
             Mesh3d(meshes.add(Cuboid::default())),
             MeshMaterial3d(fog_materials.add(FogMaterial {
-                settings: FogSettings {
+                settings: FogBindGroup {
                     color: vec3(1.0, 0.0, 0.0),
                     ..default()
                 },
@@ -77,13 +77,13 @@ fn setup(
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, ShaderType, Component, Reflect)]
-pub struct FogSettings {
+pub struct FogBindGroup {
     pub color: Vec3,
     pub distance_start: f32,
     pub distance_end: f32,
 }
 
-impl Default for FogSettings {
+impl Default for FogBindGroup {
     fn default() -> Self {
         Self {
             color: vec3(1.0, 1.0, 1.0),
@@ -95,7 +95,7 @@ impl Default for FogSettings {
 #[derive(Asset, TypePath, AsBindGroup, Debug, Clone)]
 struct FogMaterial {
     #[uniform(0)]
-    pub settings: FogSettings,
+    pub settings: FogBindGroup,
     #[texture(1, dimension = "2d")]
     #[sampler(2)]
     pub sky_texture: Handle<Image>,

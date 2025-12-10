@@ -29,7 +29,7 @@ fn vertex(@location(0) position: vec3<f32>, @builtin(instance_index) vertin: u32
     return out;
 }
 
-// AURORA ONLY render
+// only render the aurora effect
 @fragment
 fn fragment(in: VertexOutput) -> @location(0) vec4<f32> {
     let view_dir = normalize(in.world_dir);
