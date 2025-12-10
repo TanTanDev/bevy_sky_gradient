@@ -109,7 +109,7 @@ fn aurora(
 
         let selected_color = mix(settings.bottom_color.rgb, settings.color_top.rgb, height_factor);
         
-        accumulated_color += selected_color * curtain * sample_weight + sparkle * vertical_intensity;
+        accumulated_color += selected_color * curtain * sample_weight + sparkle * vertical_intensity * sample_weight;
         accumulated_alpha += sample_alpha * (1.0 - accumulated_alpha);
         
         if (accumulated_alpha > 0.95) {
