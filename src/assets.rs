@@ -1,11 +1,8 @@
-use bevy::{
-    asset::{embedded_asset, weak_handle},
-    prelude::*,
-};
+use bevy::{asset::weak_handle, prelude::*};
 
 pub const SKY_SHADER_PATH: &str = "shaders/full_sky.wgsl";
 pub const SKY_SHADER_HANDLE: Handle<Shader> = weak_handle!("0aed3aa7-55d3-43be-9e04-5637b0e9ceef");
-pub const GRADIENT_SHADER_PATH: &str = "shaders/sky_gradient.wgsl";
+pub const GRADIENT_SHADER_PATH: &str = "shaders/gradient.wgsl";
 pub const GRADIENT_SHADER_HANDLE: Handle<Shader> =
     weak_handle!("0aed3aa1-15d3-42be-9e04-5637b0e9cefc");
 pub const AURORA_SHADER_PATH: &str = "shaders/aurora.wgsl";
@@ -46,9 +43,9 @@ pub fn initialize_shaders(mut shaders: ResMut<Assets<Shader>>) {
     shaders.insert(
         &GRADIENT_SHADER_HANDLE,
         Shader::from_wgsl(
-            String::from_utf8(include_bytes!("../assets/shaders/sky_gradient.wgsl").into())
+            String::from_utf8(include_bytes!("../assets/shaders/gradient.wgsl").into())
                 .expect(format!("'{}' shader is not valid UTF-8", GRADIENT_SHADER_PATH).as_str()),
-            "bevy_sky_gradient/shaders/sky_gradient.wgsl",
+            "bevy_sky_gradient/shaders/gradient.wgsl",
         ),
     );
     shaders.insert(
