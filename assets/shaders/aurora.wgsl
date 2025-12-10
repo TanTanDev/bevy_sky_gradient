@@ -2,6 +2,7 @@
 
 struct AuroraSettings {
     bottom_color: vec4<f32>, 
+    color_top: vec4<f32>,
     alpha: f32, 
     density: f32, 
     sharpness: f32, 
@@ -15,7 +16,6 @@ struct AuroraSettings {
     wiggle_scale: f32,
     wiggle_strength: f32,
     wiggle_speed: f32,
-    color_top: vec4<f32>,
     undersparkle_color_primary: vec4f,
     undersparkle_color_secondary: vec4f,
     undersparkle_scale: f32,

@@ -82,6 +82,7 @@ impl Default for SunBindGroup {
 #[derive(Clone, Debug, Reflect, ShaderType)]
 pub struct AuroraBindGroup {
     pub color_bottom: LinearRgba,
+    pub color_top: LinearRgba,
     pub alpha: f32,
     pub density: f32,
     pub sharpness: f32,
@@ -95,7 +96,6 @@ pub struct AuroraBindGroup {
     pub wiggle_scale: f32,
     pub wiggle_strength: f32,
     pub wiggle_speed: f32,
-    pub color_top: LinearRgba,
     pub undersparkle_color_primary: LinearRgba,
     pub undersparkle_color_secondary: LinearRgba,
     pub undersparkle_scale: f32,
