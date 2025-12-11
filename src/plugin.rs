@@ -9,6 +9,7 @@ use bevy::{
 };
 
 use crate::{
+    ambient_driver::AmbientDriverPlugin,
     aurora::AuroraPlugin,
     bind_groups::GradientBindGroup,
     cycle::SkyCyclePlugin,
@@ -52,6 +53,7 @@ pub struct SkyPluginBuilder {
     pub cycle: Option<SkyCyclePlugin>,
     pub sun_driver: Option<SunDriverPlugin>,
     pub gradient_driver: Option<GradientDriverPlugin>,
+    pub ambient_driver: Option<AmbientDriverPlugin>,
 }
 
 impl Default for SkyPluginBuilder {
@@ -71,6 +73,7 @@ impl SkyPluginBuilder {
             gradient_driver: None,
             use_preset_plugin: false,
             render_sky_to_texture: false,
+            ambient_driver: None,
         }
     }
 
@@ -84,6 +87,7 @@ impl SkyPluginBuilder {
             gradient_driver: Some(GradientDriverPlugin::default()),
             use_preset_plugin: true,
             render_sky_to_texture: false,
+            ambient_driver: Some(AmbientDriverPlugin::default()),
         }
     }
 
@@ -106,16 +110,6 @@ impl SkyPluginBuilder {
         self
     }
 
-    pub fn with_sun_driver(mut self) -> Self {
-        self.sun_driver = Some(SunDriverPlugin::default());
-        self
-    }
-
-    pub fn with_gradient_driver(mut self) -> Self {
-        self.gradient_driver = Some(GradientDriverPlugin::default());
-        self
-    }
-
     pub fn with_noise_settings(mut self, noise_settings: NoiseSettings) -> Self {
         self.noise.noise_settings = noise_settings;
         self
@@ -131,13 +125,18 @@ impl SkyPluginBuilder {
         self
     }
 
+    pub fn set_aurora(mut self, aurora_plugin: AuroraPlugin) -> Self {
+        self.aurora = Some(aurora_plugin);
+        self
+    }
+
     pub fn set_gradient_driver(mut self, gradient_driver: GradientDriverPlugin) -> Self {
         self.gradient_driver = Some(gradient_driver);
         self
     }
 
-    pub fn set_aurora(mut self, aurora_plugin: AuroraPlugin) -> Self {
-        self.aurora = Some(aurora_plugin);
+    pub fn set_ambient_driver(mut self, ambient_plugin: AmbientDriverPlugin) -> Self {
+        self.ambient_driver = Some(ambient_plugin);
         self
     }
 }
@@ -186,6 +185,9 @@ impl Plugin for SkyPlugin {
                 error!("gradient driver requires cycle plugin. prepare for crash");
             }
             app.add_plugins(gradient_driver.clone());
+        }
+        if let Some(ambient_driver_plugin) = &self.sky_builder.ambient_driver {
+            app.add_plugins(ambient_driver_plugin.clone());
         }
 
         app.insert_resource(AuroraTextureHandle {

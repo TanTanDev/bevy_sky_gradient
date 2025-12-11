@@ -215,7 +215,8 @@ impl StopsColors {
 use std::cmp::Ordering;
 
 /// A color gradient with linear interpolation.
-#[derive(Clone, Debug, PartialEq)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Clone, Debug, PartialEq, Reflect)]
 pub struct Gradient {
     pub stops: Vec<(f32, [u8; 4])>,
 }

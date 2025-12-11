@@ -1,3 +1,4 @@
+pub mod ambient_driver;
 pub mod assets;
 pub mod aurora;
 pub mod aurora_material;

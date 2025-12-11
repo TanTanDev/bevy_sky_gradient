@@ -1,6 +1,7 @@
 use bevy::{prelude::*, render::view::RenderLayers};
 use bevy_flycam::{FlyCam, NoCameraPlayerPlugin};
 use bevy_sky_gradient::{
+    ambient_driver::{AmbientDriverPlugin, AmbientSettings},
     aurora::AuroraSettings,
     aurora_material::AuroraMaterial,
     cycle::{SkyCyclePlugin, SkyTime, SkyTimeSettings},
@@ -37,6 +38,7 @@ fn main() {
         .add_plugins(ResourceInspectorPlugin::<AuroraSettings>::default())
         .add_plugins(ResourceInspectorPlugin::<NoiseSettings>::default())
         .add_plugins(ResourceInspectorPlugin::<SkyTimeSettings>::default())
+        .add_plugins(ResourceInspectorPlugin::<AmbientSettings>::default())
         // camera
         .add_plugins(NoCameraPlayerPlugin)
         // SKY plugin
