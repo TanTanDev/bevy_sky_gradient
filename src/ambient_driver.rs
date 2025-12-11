@@ -82,20 +82,20 @@ impl Default for AmbientColorsBuilder {
     fn default() -> Self {
         Self {
             color_gradient: GradientBuilder {
-                sunrise_color: [255, 0, 0, 255],
-                day_low_color: [255, 255, 255, 255],
-                day_high_color: [255, 255, 255, 255],
-                sunset_color: [255, 0, 255, 255],
-                night_low_color: [100, 100, 100, 255],
-                night_high_color: [100, 100, 100, 255],
+                sunrise_color: [255, 255, 200, 255],
+                day_low_color: [255, 255, 150, 255],
+                day_high_color: [255, 255, 200, 255],
+                sunset_color: [240, 240, 255, 255],
+                night_low_color: [150, 150, 225, 255],
+                night_high_color: [100, 100, 150, 255],
             },
             scalar_gradient: ScalarGradientBuilder {
-                sunrise_color: 0.3,
-                day_low_color: 1.0,
+                sunrise_color: 0.4,
+                day_low_color: 0.6,
                 day_high_color: 1.0,
-                sunset_color: 0.3,
+                sunset_color: 0.4,
                 night_low_color: 0.3,
-                night_high_color: 0.1,
+                night_high_color: 0.15,
             },
         }
     }
