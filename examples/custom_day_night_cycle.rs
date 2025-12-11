@@ -2,7 +2,8 @@ use bevy::{color::palettes::css::WHITE, pbr::light_consts::lux::AMBIENT_DAYLIGHT
 use bevy_flycam::{FlyCam, NoCameraPlayerPlugin};
 use bevy_sky_gradient::{
     cycle::{SkyCyclePlugin, SkyTime, SkyTimeSettings},
-    gradient::{FullGradientMaterial, GradientDriverPlugin, SkyColorsBuilder, StopsColors},
+    gradient::{GradientBuilder, SkyGradientBuilder},
+    gradient_driver::GradientDriverPlugin,
     noise::NoiseHandles,
     plugin::{AuroraTextureHandle, GradientTextureHandle, SkyPlugin, SkyboxMagnetTag},
     sky_material::FullSkyMaterial,
@@ -38,22 +39,8 @@ fn main() {
                         sun_sharpness: default(),
                     },
                 })
-                // THIS WILL CREATE A SOLID COLOR, because the stops are the same
-                // except for the day high, which we make very wonky
                 .set_gradient_driver(GradientDriverPlugin {
-                    sky_colors_builder: SkyColorsBuilder {
-                        sunset_color: StopsColors::new_splat([255, 0, 0, 255]),
-                        sunrise_color: StopsColors::new_splat([255, 0, 0, 255]),
-                        day_low_color: StopsColors::new_splat([100, 100, 255, 255]),
-                        day_high_color: StopsColors {
-                            stop0: [0, 255, 0, 255],
-                            stop1: [255, 0, 0, 255],
-                            stop2: [0, 0, 255, 255],
-                            stop3: [0, 255, 255, 255],
-                        },
-                        night_low_color: StopsColors::new_splat([0, 0, 70, 255]),
-                        night_high_color: StopsColors::new_splat([0, 0, 0, 255]),
-                    },
+                    sky_colors_builder: CUSTOM_SKY_COLORS_BUILDER,
                 })
                 .build(),
         )
@@ -114,3 +101,38 @@ fn setup(
         FlyCam,
     ));
 }
+
+pub const CUSTOM_SKY_COLORS_BUILDER: SkyGradientBuilder = SkyGradientBuilder {
+    gradient_builder_stop0: GradientBuilder {
+        sunrise_color: [255, 0, 0, 255],
+        day_low_color: [0, 0, 248, 255],
+        day_high_color: [0, 48, 255, 255],
+        sunset_color: [255, 70, 70, 255],
+        night_low_color: [0, 0, 0, 245],
+        night_high_color: [0, 0, 0, 245],
+    },
+    gradient_builder_stop1: GradientBuilder {
+        sunrise_color: [255, 0, 0, 255],
+        day_low_color: [0, 0, 255, 255],
+        day_high_color: [0, 226, 255, 255],
+        sunset_color: [243, 84, 47, 255],
+        night_low_color: [0, 0, 0, 245],
+        night_high_color: [0, 0, 0, 245],
+    },
+    gradient_builder_stop2: GradientBuilder {
+        sunrise_color: [255, 0, 0, 255],
+        day_low_color: [0, 0, 254, 255],
+        day_high_color: [0, 170, 255, 255],
+        sunset_color: [255, 242, 72, 255],
+        night_low_color: [0, 0, 0, 245],
+        night_high_color: [0, 0, 0, 245],
+    },
+    gradient_builder_stop3: GradientBuilder {
+        sunrise_color: [255, 0, 0, 255],
+        day_low_color: [0, 0, 255, 255],
+        day_high_color: [0, 195, 255, 255],
+        sunset_color: [73, 177, 250, 255],
+        night_low_color: [0, 0, 0, 245],
+        night_high_color: [0, 0, 0, 245],
+    },
+};

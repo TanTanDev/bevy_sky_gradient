@@ -13,7 +13,8 @@ use crate::{
     aurora::AuroraPlugin,
     bind_groups::GradientBindGroup,
     cycle::SkyCyclePlugin,
-    gradient::{FullGradientMaterial, GradientDriverPlugin},
+    gradient_driver::GradientDriverPlugin,
+    gradient_material::{FullGradientMaterial, GradientMaterialPlugin},
     noise::{NoiseHandles, NoisePlugin, NoiseSettings},
     presets::SkyPresetPlugin,
     sky_material::FullSkyMaterial,
@@ -163,6 +164,7 @@ impl Plugin for SkyPlugin {
         app.insert_resource(self.sky_builder.settings.clone());
         app.add_plugins(self.sky_builder.noise.clone());
         app.add_plugins(SkyPresetPlugin);
+        app.add_plugins(GradientMaterialPlugin);
 
         if self.sky_builder.render_sky_to_texture {
             app.add_plugins(SkyTexturePlugin::default());

@@ -1,11 +1,12 @@
 use bevy::{prelude::*, render::view::RenderLayers};
 use bevy_flycam::{FlyCam, NoCameraPlayerPlugin};
 use bevy_sky_gradient::{
-    ambient_driver::{AmbientDriverPlugin, AmbientSettings},
+    ambient_driver::{AmbientColorsBuilder, AmbientDriverPlugin, AmbientSettings},
     aurora::AuroraSettings,
     aurora_material::AuroraMaterial,
     cycle::{SkyCyclePlugin, SkyTime, SkyTimeSettings},
-    gradient::{FullGradientMaterial, Gradient, SkyColors},
+    gradient::{Gradient, SkyGradients},
+    gradient_material::FullGradientMaterial,
     noise::NoiseSettings,
     plugin::{SkyPlugin, SkyboxMagnetTag},
     sky_material::FullSkyMaterial,
@@ -39,6 +40,7 @@ fn main() {
         .add_plugins(ResourceInspectorPlugin::<NoiseSettings>::default())
         .add_plugins(ResourceInspectorPlugin::<SkyTimeSettings>::default())
         .add_plugins(ResourceInspectorPlugin::<AmbientSettings>::default())
+        .add_plugins(ResourceInspectorPlugin::<AmbientColorsBuilder>::default())
         // camera
         .add_plugins(NoCameraPlayerPlugin)
         // SKY plugin
@@ -114,7 +116,7 @@ fn edit_ui(mut world: &mut World) {
     show_save_load_preset_uis(world, &mut egui_context);
 
     egui::Window::new("gradient colors").show(egui_context.get_mut(), |mut ui| {
-        let mut sky_colors = world.get_resource_mut::<SkyColors>().unwrap();
+        let mut sky_colors = world.get_resource_mut::<SkyGradients>().unwrap();
         let mut id = 0;
         // helper function to render gradient ui
         // convert our Gradient, to the egui_colorgradient::Gradient
@@ -160,8 +162,7 @@ fn edit_ui(mut world: &mut World) {
 
 #[cfg(feature = "serde")]
 fn show_save_load_preset_uis(world: &mut World, egui_context: &mut EguiContext) {
-    use bevy_sky_gradient::gradient::FullGradientMaterial;
-    use bevy_sky_gradient::gradient::SkyColorsBuilder;
+    use bevy_sky_gradient::gradient::SkyGradientBuilder;
     use bevy_sky_gradient::presets::{ApplyPresetEvent, SkyPreset};
     use bevy_sky_gradient::utils::path_relative_to_bevy_exe;
 
@@ -191,7 +192,7 @@ fn show_save_load_preset_uis(world: &mut World, egui_context: &mut EguiContext) 
             let current_sky_material = all_sky_materials.iter().next().unwrap().1;
 
             let sun_settings = world.get_resource::<SunSettings>().unwrap();
-            let sky_colors_builder = world.get_resource::<SkyColorsBuilder>().unwrap();
+            let sky_colors_builder = world.get_resource::<SkyGradientBuilder>().unwrap();
             // fetch the sky information
             let sky_preset = SkyPreset {
                 aurora_settings: Some(current_aurora_material.aurora_settings.clone()),

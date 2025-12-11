@@ -5,6 +5,8 @@ pub mod aurora_material;
 pub mod bind_groups;
 pub mod cycle;
 pub mod gradient;
+pub mod gradient_driver;
+pub mod gradient_material;
 pub mod noise;
 pub mod plugin;
 pub mod presets;
