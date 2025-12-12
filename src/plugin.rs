@@ -11,7 +11,7 @@ use bevy::{
 use crate::{
     ambient_driver::AmbientDriverPlugin,
     aurora::AuroraPlugin,
-    bind_groups::GradientBindGroup,
+    bind_groups::{GradientBindGroup, StarsBindGroup},
     cycle::SkyCyclePlugin,
     gradient_driver::GradientDriverPlugin,
     gradient_material::{FullGradientMaterial, GradientMaterialPlugin},
@@ -28,6 +28,7 @@ pub struct SkySettings {
     pub camera_gradient_order: isize,
     pub skybox_gradient_render_layer: RenderLayers,
     pub spawn_default_skybox: bool,
+    pub stars_bind_group: StarsBindGroup,
 }
 
 impl Default for SkySettings {
@@ -36,6 +37,7 @@ impl Default for SkySettings {
             camera_gradient_order: 3,
             spawn_default_skybox: true,
             skybox_gradient_render_layer: RenderLayers::layer(6),
+            stars_bind_group: StarsBindGroup::default(),
         }
     }
 }
@@ -90,6 +92,11 @@ impl SkyPluginBuilder {
             render_sky_to_texture: false,
             ambient_driver: Some(AmbientDriverPlugin::default()),
         }
+    }
+
+    pub fn set_sky_settings(mut self, sky_settings: SkySettings) -> Self {
+        self.settings = sky_settings;
+        self
     }
 
     pub fn set_spawn_default_skybox(mut self, spawn_default_skybox: bool) -> Self {
@@ -236,6 +243,7 @@ fn spawn_default_skybox(
     aurora_handles: Res<AuroraTextureHandle>,
     gradient_texture_handle: Res<GradientTextureHandle>,
     sky_texture_plugin_settings: Option<Res<SkyTexturePluginSettings>>,
+    sky_settings: Res<SkySettings>,
 ) {
     let mut skybox_commands = commands.spawn((
         Name::new("sky_gradient_skybox"),
@@ -245,6 +253,7 @@ fn spawn_default_skybox(
             voronoi3_image: noise_handles.voronoi3.clone(),
             aurora_image: aurora_handles.render_target.clone(),
             gradient_image: gradient_texture_handle.render_target.clone(),
+            stars: sky_settings.stars_bind_group.clone(),
             ..default()
         })),
     ));
