@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_flycam::{FlyCam, NoCameraPlayerPlugin};
-use bevy_sky_gradient::plugin::{SkyPlugin, SkyboxMagnetTag};
+use bevy_sky_gradient::prelude::*;
 
 fn main() {
     App::new()

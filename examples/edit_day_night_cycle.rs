@@ -1,16 +1,12 @@
 use bevy::{prelude::*, render::view::RenderLayers};
 use bevy_flycam::{FlyCam, NoCameraPlayerPlugin};
 use bevy_sky_gradient::{
-    ambient_driver::{AmbientColorsBuilder, AmbientDriverPlugin, AmbientSettings},
-    aurora::AuroraSettings,
+    ambient_driver::AmbientColorsBuilder,
     aurora_material::AuroraMaterial,
-    cycle::{SkyCyclePlugin, SkyTime, SkyTimeSettings},
     gradient::{Gradient, SkyGradients},
     gradient_material::FullGradientMaterial,
-    noise::NoiseSettings,
-    plugin::{SkyPlugin, SkyboxMagnetTag},
+    prelude::*,
     sky_material::FullSkyMaterial,
-    sun::{SunDriverTag, SunSettings},
 };
 
 use bevy_inspector_egui::{

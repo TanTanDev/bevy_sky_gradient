@@ -10,7 +10,7 @@ use bevy_inspector_egui::{
     bevy_egui::{EguiGlobalSettings, EguiPlugin, PrimaryEguiContext},
     quick::WorldInspectorPlugin,
 };
-use bevy_sky_gradient::plugin::{GradientTextureHandle, SkyPlugin, SkyboxMagnetTag};
+use bevy_sky_gradient::{plugin::GradientTextureHandle, prelude::*};
 use rand::Rng;
 
 // this example illustrates, how you can correctly blend the skycolor into your shaders

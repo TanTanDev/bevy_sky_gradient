@@ -1,13 +1,11 @@
 use bevy::{color::palettes::css::WHITE, pbr::light_consts::lux::AMBIENT_DAYLIGHT, prelude::*};
 use bevy_flycam::{FlyCam, NoCameraPlayerPlugin};
 use bevy_sky_gradient::{
-    cycle::{SkyCyclePlugin, SkyTime, SkyTimeSettings},
     gradient::{GradientBuilder, SkyGradientBuilder},
-    gradient_driver::GradientDriverPlugin,
     noise::NoiseHandles,
-    plugin::{AuroraTextureHandle, GradientTextureHandle, SkyPlugin, SkyboxMagnetTag},
+    plugin::{AuroraTextureHandle, GradientTextureHandle},
+    prelude::*,
     sky_material::FullSkyMaterial,
-    sun::{SunDriverPlugin, SunDriverTag, SunSettings},
 };
 
 // This example show how you can customize any aspect of the sky

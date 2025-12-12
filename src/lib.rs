@@ -16,5 +16,11 @@ pub mod sun;
 pub mod utils;
 
 pub mod prelude {
-    pub use crate::plugin::SkyPlugin;
+    pub use crate::ambient_driver::{AmbientDriverPlugin, AmbientSettings};
+    pub use crate::aurora::{AuroraPlugin, AuroraSettings};
+    pub use crate::cycle::{SkyCyclePlugin, SkyTime, SkyTimeSettings};
+    pub use crate::gradient_driver::GradientDriverPlugin;
+    pub use crate::noise::{NoisePlugin, NoiseSettings};
+    pub use crate::plugin::{SkyPlugin, SkySettings, SkyboxMagnetTag};
+    pub use crate::sun::{SunDriverPlugin, SunDriverTag, SunSettings};
 }
