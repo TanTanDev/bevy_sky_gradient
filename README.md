@@ -1,4 +1,7 @@
 # Bevy Sky Gradient
+[![Crates.io](https://img.shields.io/crates/v/bevy_sky_gradient.svg)](https://crates.io/crates/bevy_sky_gradient)
+[![MIT/Apache 2.0](https://img.shields.io/badge/license-MIT%2FApache-blue.svg)](./LICENSE)
+[![Crates.io](https://img.shields.io/crates/d/bevy_sky_gradient.svg)](https://crates.io/crates/bevy_sky_gradient)
 
 A simple and beautiful procedural sky shader for the Bevy game engine.
 
@@ -84,7 +87,7 @@ SkyPlugin::builder()
 
 ## Bevy support table
 
-| bevy | Bevy Gradient Sky |
+| bevy | Bevy Sky Gradient |
 | ---- | ------------------- |
 | 0.16 | 0.1.0               |
 
