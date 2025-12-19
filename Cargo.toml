@@ -2,6 +2,11 @@
 name = "bevy_sky_gradient"
 version = "0.1.0"
 edition = "2024"
+categories = ["bevy"]
+licence = ["MIT or Apache-2.0"]
+readme = "README.md"
+description = "Sky rendering plugin for bevy featuring, sky gradient, aurora / northern lights, stars, sun, day-night cycle"
+repository = "https://github.com/TanTanDev/bevy_sky_gradient"
 
 [features]
 default = ["serde"]
