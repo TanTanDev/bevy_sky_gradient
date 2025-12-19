@@ -7,12 +7,12 @@
 
 #import "bevy_sky_gradient/shaders/aurora.wgsl"::{AuroraSettings, aurora};
 
-@group(2) @binding(0)
+@group(#{MATERIAL_BIND_GROUP}) @binding(0)
 var<uniform> aurora_settings: AuroraSettings;
 
-@group(2) @binding(1)
+@group(#{MATERIAL_BIND_GROUP}) @binding(1)
 var noise3_texture: texture_3d<f32>;
-@group(2) @binding(2)
+@group(#{MATERIAL_BIND_GROUP}) @binding(2)
 var noise3_texture_sampler: sampler;
 
 struct VertexOutput {

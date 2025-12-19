@@ -7,7 +7,7 @@
 
 #import "bevy_sky_gradient/shaders/gradient.wgsl"::{GradientSettings, gradient};
 
-@group(2) @binding(0)
+@group(#{MATERIAL_BIND_GROUP}) @binding(0)
 var<uniform> gradient_settings: GradientSettings;
 
 struct VertexOutput {

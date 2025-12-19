@@ -1,6 +1,6 @@
 use std::f32::consts::PI;
 
-use bevy::{color::palettes::css::WHITE, pbr::light_consts::lux::AMBIENT_DAYLIGHT, prelude::*};
+use bevy::{color::palettes::css::WHITE, light::light_consts::lux::AMBIENT_DAYLIGHT, prelude::*};
 
 use crate::{
     cycle::{SkyTime, SkyTimeSettings},
@@ -10,7 +10,7 @@ use crate::{
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-// Marker for updating the position of the light
+/// Marker for updating the position of the light
 #[derive(Component)]
 pub struct SunDriverTag;
 
@@ -34,8 +34,8 @@ impl Default for SunSettings {
     }
 }
 
-///! "Drives" a sun light source
-///! and updates the sun values of full_sky material
+/// "Drives" a sun light source
+/// and updates the sun values of full_sky material
 #[derive(Clone)]
 pub struct SunDriverPlugin {
     pub spawn_default_sun_light: bool,

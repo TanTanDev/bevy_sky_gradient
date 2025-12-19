@@ -1,11 +1,9 @@
 use bevy::{
     asset::RenderAssetUsages,
+    camera::visibility::RenderLayers,
     image::ImageSampler,
     prelude::*,
-    render::{
-        render_resource::{Extent3d, TextureDimension, TextureFormat, TextureUsages},
-        view::RenderLayers,
-    },
+    render::render_resource::{Extent3d, TextureDimension, TextureFormat, TextureUsages},
 };
 
 use crate::{
@@ -42,13 +40,13 @@ impl Default for SkySettings {
     }
 }
 
-///! controlls what features you want.  
-///! you might not want to use the default Cycle/SunDriver/GradientDriver/Aurora for example
-///! then you can skip that plugin and implement your own.
+/// controlls what features you want.  
+/// you might not want to use the default Cycle/SunDriver/GradientDriver/Aurora for example
+/// then you can skip that plugin and implement your own.
 pub struct SkyPluginBuilder {
     pub settings: SkySettings,
-    ///! if enabled, the full sky is rendered to a texture
-    ///! usefull if you need to sample the sky for a fog effect for example
+    /// if enabled, the full sky is rendered to a texture
+    /// usefull if you need to sample the sky for a fog effect for example
     pub render_sky_to_texture: bool,
     pub use_preset_plugin: bool,
     pub noise: NoisePlugin,
@@ -149,11 +147,8 @@ impl SkyPluginBuilder {
     }
 }
 
-///! sets up all you need to show a gradient skybox
+/// sets up all you need to show a gradient skybox
 pub struct SkyPlugin {
-    ///! if true, an entity skybox will spawn
-    // pub spawn_default_skybox: bool,
-    // pub spawn_default_skybox_gradient: bool,
     pub sky_builder: SkyPluginBuilder,
 }
 
@@ -218,7 +213,7 @@ impl Plugin for SkyPlugin {
 
         app.add_systems(
             PostUpdate,
-            (sky_follow_camera, gradient_follow_camera).before(TransformSystem::TransformPropagate),
+            (sky_follow_camera, gradient_follow_camera).before(TransformSystems::Propagate),
         );
     }
 }
@@ -231,7 +226,7 @@ impl Default for SkyPlugin {
     }
 }
 
-///! attach to your main camera for the skybox to auto move to
+/// attach to your main camera for the skybox to auto move to
 #[derive(Component)]
 pub struct SkyboxMagnetTag;
 

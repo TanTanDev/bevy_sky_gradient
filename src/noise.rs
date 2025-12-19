@@ -8,8 +8,7 @@ use bevy::{
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-// we will bake noise funcitons into textures for performance reasons
-// 3D textures for noise3d, and voronoi3d
+/// handles for our noise 3D textures for noise3d, and voronoi3d
 #[derive(Resource)]
 pub struct NoiseHandles {
     pub noise3: Handle<Image>,
@@ -36,18 +35,18 @@ impl Plugin for NoisePlugin {
     }
 }
 
-///! texture_size data chart:
-///! 64x64x64 = 0.25 mb
-///! 128x128x128 = 2 mb
-///! 256x256x256 = 16 mb
-///! 514x514x514 = 129 mb
+/// texture_size data chart:
+/// 64x64x64 = 0.25 mb
+/// 128x128x128 = 2 mb
+/// 256x256x256 = 16 mb
+/// 514x514x514 = 129 mb
 #[derive(Resource, Reflect, Clone)]
 pub struct NoiseSettings {
-    ///! size of 3d noise texture
+    /// size of 3d noise texture
     pub noise_texture_size: u32,
-    ///! size of 3d noise texture
+    /// size of 3d noise texture
     pub voronoi_texture_size: u32,
-    ///! if set, USERS may not exceed this size
+    /// if set, USERS may not exceed this size
     pub noise_size_limit: Option<u32>,
 
     #[cfg(feature = "serde")]
@@ -151,7 +150,6 @@ pub fn update_noise_textures(
             let fs_file_path = format!("assets/noise/{}", file_name);
             // does file exists, then load otherwise create file and load
             if std::fs::exists(path_relative_to_bevy_exe(&fs_file_path)).unwrap_or(false) {
-                // LOAD FILE
                 let bevy_file_path = format!("noise/{}", file_name);
                 let handle = asset_server.load::<NoiseTextureAsset>(bevy_file_path);
                 commands.insert_resource(PendingNoiseTextureAsset(handle));
@@ -264,7 +262,7 @@ fn make_noise_sampler() -> ImageSampler {
     })
 }
 
-///! will wait until a noisetextureasset is loaded, then override hte texture data
+/// will wait until a noisetextureasset is loaded, then override the texture data
 #[cfg(feature = "serde")]
 #[derive(Resource)]
 pub struct PendingNoiseTextureAsset(Handle<NoiseTextureAsset>);
@@ -293,6 +291,7 @@ pub fn generate_noise3(size: usize) -> Vec<u8> {
     }
     voxels
 }
+
 fn noise3(p: Vec3) -> f32 {
     fn mod289(x: Vec4) -> Vec4 {
         x - (x * (1.0 / 289.0)).floor() * 289.0
@@ -379,7 +378,7 @@ fn hash33(p: Vec3) -> Vec3 {
     return ((p3.xxy() + p3.yxx()) * p3.zyx()).fract();
 }
 
-///! file data of noise textures to avoid slow noise generation
+/// file data of noise textures to avoid slow noise generation
 #[cfg(feature = "serde")]
 #[derive(Asset, TypePath, Clone, Serialize, Deserialize)]
 pub struct NoiseTextureAsset {

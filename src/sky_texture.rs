@@ -1,11 +1,9 @@
 use bevy::{
     asset::RenderAssetUsages,
+    camera::visibility::RenderLayers,
     image::ImageSampler,
     prelude::*,
-    render::{
-        render_resource::{Extent3d, TextureDimension, TextureFormat, TextureUsages},
-        view::RenderLayers,
-    },
+    render::render_resource::{Extent3d, TextureDimension, TextureFormat, TextureUsages},
     window::WindowResized,
 };
 
@@ -16,7 +14,7 @@ pub struct FullSkyTextureHandle {
     pub render_target: Handle<Image>,
 }
 
-///! tag to find camera that render the sky
+/// tag to find camera that render the sky
 #[derive(Component)]
 pub struct FullSkyCameraTag;
 
@@ -56,7 +54,7 @@ impl Default for SkyTexturePlugin {
     }
 }
 
-///! holds the quad where we render the sky
+/// holds the quad where we render the sky
 #[derive(Component)]
 pub struct FullSkySpriteTag;
 
@@ -75,7 +73,7 @@ impl Plugin for SkyTexturePlugin {
         app.add_systems(
             PostUpdate,
             (
-                full_sky_camera_follow_primary.before(TransformSystem::TransformPropagate),
+                full_sky_camera_follow_primary.before(TransformSystems::Propagate),
                 resize_full_sky_on_window_change,
             ),
         );
@@ -114,7 +112,7 @@ pub fn spawn_full_sky_texture(
 
 // System to resize the full sky texture when the window changes
 fn resize_full_sky_on_window_change(
-    mut resize_events: EventReader<WindowResized>,
+    mut resize_events: MessageReader<WindowResized>,
     mut images: ResMut<Assets<Image>>,
     sky_handles: Res<FullSkyTextureHandle>,
     primary_windows: Query<&Window, With<bevy::window::PrimaryWindow>>,
@@ -204,7 +202,7 @@ fn spawn_full_sky_screen_quad(
             ..default()
         },
         Projection::Orthographic(OrthographicProjection {
-            scaling_mode: bevy::render::camera::ScalingMode::Fixed {
+            scaling_mode: bevy::camera::ScalingMode::Fixed {
                 width: 1.0,
                 height: 1.0,
             },

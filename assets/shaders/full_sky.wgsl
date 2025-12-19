@@ -8,40 +8,40 @@
 #import "bevy_sky_gradient/shaders/sun.wgsl"::{SunSettings, sun};
 #import "bevy_sky_gradient/shaders/stars.wgsl"::{StarsSettings, stars};
 
-@group(2) @binding(0)
+@group(#{MATERIAL_BIND_GROUP}) @binding(0)
 var<uniform> sun_settings: SunSettings;
-@group(2) @binding(1)
+@group(#{MATERIAL_BIND_GROUP}) @binding(1)
 var<uniform> stars_settings: StarsSettings;
 
-@group(2) @binding(2)
+@group(#{MATERIAL_BIND_GROUP}) @binding(2)
 var<uniform> night_time_distance: f32;
-@group(2) @binding(3)
+@group(#{MATERIAL_BIND_GROUP}) @binding(3)
 var<uniform> night_visibility_range: vec2<f32>;
 
-@group(2) @binding(4)
+@group(#{MATERIAL_BIND_GROUP}) @binding(4)
 var<uniform> feature_stars_enabled: i32;
-@group(2) @binding(5)
+@group(#{MATERIAL_BIND_GROUP}) @binding(5)
 var<uniform> feature_sun_enabled: i32;
-@group(2) @binding(6)
+@group(#{MATERIAL_BIND_GROUP}) @binding(6)
 var<uniform> feature_aurora_enabled: i32;
 
-@group(2) @binding(10)
+@group(#{MATERIAL_BIND_GROUP}) @binding(10)
 var noise3_texture: texture_3d<f32>;
-@group(2) @binding(11)
+@group(#{MATERIAL_BIND_GROUP}) @binding(11)
 var noise3_texture_sampler: sampler;
 
-@group(2) @binding(12)
+@group(#{MATERIAL_BIND_GROUP}) @binding(12)
 var voronoi3_texture: texture_3d<f32>;
-@group(2) @binding(13)
+@group(#{MATERIAL_BIND_GROUP}) @binding(13)
 var voronoi3_texture_sampler: sampler;
 
-@group(2) @binding(14)
+@group(#{MATERIAL_BIND_GROUP}) @binding(14)
 var aurora_texture: texture_2d<f32>;
-@group(2) @binding(15)
+@group(#{MATERIAL_BIND_GROUP}) @binding(15)
 var aurora_texture_sampler: sampler;
-@group(2) @binding(16)
+@group(#{MATERIAL_BIND_GROUP}) @binding(16)
 var gradient_texture: texture_2d<f32>;
-@group(2) @binding(17)
+@group(#{MATERIAL_BIND_GROUP}) @binding(17)
 var gradient_texture_sampler: sampler;
 
 struct VertexOutput {

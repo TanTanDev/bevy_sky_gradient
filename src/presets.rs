@@ -45,9 +45,9 @@ pub const DEFAULT_SKY_COLORS_BUILDER: SkyGradientBuilder = SkyGradientBuilder {
     },
 };
 
-///! data that controlls the look of a sky
-///! (not aurora upsampling size, nor noise 3dTexture, performance and "look" should be seperate)
-///! (None) values will not override current sky settings.
+/// data that controlls the look of a sky
+/// (not aurora upsampling size, nor noise 3dTexture, performance and "look" should be seperate)
+/// (None) values will not override current sky settings.
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Default)]
 pub struct SkyPreset {
@@ -62,18 +62,18 @@ pub struct SkyPresetPlugin;
 
 impl Plugin for SkyPresetPlugin {
     fn build(&self, app: &mut App) {
-        app.add_event::<ApplyPresetEvent>();
+        app.add_message::<ApplyPresetEvent>();
         app.add_systems(Update, handle_apply_preset_events);
     }
 }
 
-#[derive(Event)]
+#[derive(Message)]
 pub struct ApplyPresetEvent {
     pub sky_preset: SkyPreset,
 }
 
 pub fn handle_apply_preset_events(
-    mut events: EventReader<ApplyPresetEvent>,
+    mut events: MessageReader<ApplyPresetEvent>,
     skyboxes: Query<&mut MeshMaterial3d<FullSkyMaterial>>,
     auroras: Query<&mut MeshMaterial3d<AuroraMaterial>>,
     gradient_handles: Query<&mut MeshMaterial3d<FullGradientMaterial>>,

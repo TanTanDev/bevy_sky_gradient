@@ -13,13 +13,13 @@ struct FogSettings {
     distance_end: f32,
 }
 
-@group(2) @binding(0)
+@group(#{MATERIAL_BIND_GROUP}) @binding(0)
 var<uniform> fog_settings: FogSettings;
 
-@group(2) @binding(1)
+@group(#{MATERIAL_BIND_GROUP}) @binding(1)
 var sky_gradient_texture: texture_2d<f32>;
 
-@group(2) @binding(2)
+@group(#{MATERIAL_BIND_GROUP}) @binding(2)
 var sky_gradient_sampler: sampler;
 
 // this is an example how your own shaders that needs fog, can sample the sky gradient texture

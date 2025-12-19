@@ -11,7 +11,7 @@ use crate::{
     plugin::GradientTextureHandle,
 };
 
-///! animates the sky gradients, REQUIRES CyclePlugin.
+/// animates the sky gradients, REQUIRES CyclePlugin.
 #[derive(Clone, Default)]
 pub struct GradientDriverPlugin {
     pub sky_colors_builder: SkyGradientBuilder,
@@ -44,7 +44,7 @@ fn update_sky_colors_builder(
     *sky_colors = sky_colors_builder.build(&sky_time_settings);
 }
 
-///! drive the sky materials
+/// drive the sky materials
 fn drive_gradients(
     sky_time_settings: Res<SkyTimeSettings>,
     sky_time: Res<SkyTime>,
@@ -73,7 +73,7 @@ fn drive_gradients(
 }
 
 fn resize_gradient_on_window_change(
-    mut resize_events: EventReader<WindowResized>,
+    mut resize_events: MessageReader<WindowResized>,
     mut images: ResMut<Assets<Image>>,
     aurora_handles: Res<GradientTextureHandle>,
     primary_windows: Query<&Window, With<PrimaryWindow>>,

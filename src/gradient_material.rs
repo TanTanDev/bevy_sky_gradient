@@ -1,8 +1,12 @@
 use bevy::{
-    pbr::Material,
+    mesh::MeshVertexBufferLayoutRef,
+    pbr::{Material, MaterialPipeline, MaterialPipelineKey},
     prelude::*,
     reflect::Reflect,
-    render::render_resource::{AsBindGroup, CompareFunction, ShaderRef},
+    render::render_resource::{
+        AsBindGroup, CompareFunction, RenderPipelineDescriptor, SpecializedMeshPipelineError,
+    },
+    shader::ShaderRef,
 };
 
 use crate::bind_groups::GradientBindGroup;
@@ -30,11 +34,11 @@ impl Material for FullGradientMaterial {
     }
 
     fn specialize(
-        _pipeline: &bevy::pbr::MaterialPipeline<Self>,
-        descriptor: &mut bevy::render::render_resource::RenderPipelineDescriptor,
-        _layout: &bevy::render::mesh::MeshVertexBufferLayoutRef,
-        _key: bevy::pbr::MaterialPipelineKey<Self>,
-    ) -> Result<(), bevy::render::render_resource::SpecializedMeshPipelineError> {
+        _pipeline: &MaterialPipeline,
+        descriptor: &mut RenderPipelineDescriptor,
+        _layout: &MeshVertexBufferLayoutRef,
+        _key: MaterialPipelineKey<Self>,
+    ) -> Result<(), SpecializedMeshPipelineError> {
         if let Some(depth_stencil) = &mut descriptor.depth_stencil {
             depth_stencil.depth_write_enabled = false;
             depth_stencil.depth_compare = CompareFunction::Always;

@@ -1,4 +1,4 @@
-use bevy::{color::palettes::css::WHITE, pbr::light_consts::lux::AMBIENT_DAYLIGHT, prelude::*};
+use bevy::{color::palettes::css::WHITE, light::light_consts::lux::AMBIENT_DAYLIGHT, prelude::*};
 use bevy_flycam::{FlyCam, NoCameraPlayerPlugin};
 use bevy_sky_gradient::{
     gradient::{GradientBuilder, SkyGradientBuilder},

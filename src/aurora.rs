@@ -1,6 +1,8 @@
 use bevy::{
+    camera::visibility::RenderLayers,
     prelude::*,
-    render::{render_resource::Extent3d, view::RenderLayers},
+    render::render_resource::Extent3d,
+    transform::plugins::TransformSystems,
     window::{PrimaryWindow, WindowResized},
 };
 
@@ -16,11 +18,11 @@ pub struct AuroraCameraTag;
 
 #[derive(Resource, Reflect, Clone)]
 pub struct AuroraSettings {
-    ///! controlls size of the render target of the aurora material
-    ///! a value of 1.0: use 100% of the windows screen size. aka full quality.
-    ///! a value of 0.5: will render the aurora 50% of the screen and be upscaled 200%
+    /// controlls size of the render target of the aurora material
+    /// a value of 1.0: use 100% of the windows screen size. aka full quality.
+    /// a value of 0.5: will render the aurora 50% of the screen and be upscaled 200%
     pub render_texture_percent: f32,
-    ///! what render layer the aurora will render on
+    /// what render layer the aurora will render on
     pub camera_render_layers: RenderLayers,
     pub camera_order: isize,
 }
@@ -60,7 +62,7 @@ impl Plugin for AuroraPlugin {
         app.add_systems(
             PostUpdate,
             (aurora_follow_camera, resize_aurora_on_window_change)
-                .before(TransformSystem::TransformPropagate),
+                .before(TransformSystems::Propagate),
         );
     }
 }
@@ -87,7 +89,7 @@ fn aurora_follow_camera(
 }
 
 fn resize_aurora_on_window_change(
-    mut resize_events: EventReader<WindowResized>,
+    mut resize_events: MessageReader<WindowResized>,
     mut images: ResMut<Assets<Image>>,
     aurora_handles: Res<AuroraTextureHandle>,
     aurora_settings: Res<AuroraSettings>,

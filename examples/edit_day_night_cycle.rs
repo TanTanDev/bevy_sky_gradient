@@ -1,12 +1,8 @@
-use bevy::{prelude::*, render::view::RenderLayers};
+use bevy::{camera::visibility::RenderLayers, prelude::*};
 use bevy_flycam::{FlyCam, NoCameraPlayerPlugin};
 use bevy_sky_gradient::{
-    ambient_driver::AmbientColorsBuilder,
-    aurora_material::AuroraMaterial,
-    gradient::{Gradient, SkyGradients},
-    gradient_material::FullGradientMaterial,
-    prelude::*,
-    sky_material::FullSkyMaterial,
+    ambient_driver::AmbientColorsBuilder, aurora_material::AuroraMaterial,
+    gradient_material::FullGradientMaterial, prelude::*, sky_material::FullSkyMaterial,
 };
 
 use bevy_inspector_egui::{
@@ -18,7 +14,6 @@ use bevy_inspector_egui::{
     egui,
     quick::{AssetInspectorPlugin, ResourceInspectorPlugin},
 };
-use egui_colorgradient::gradient_editor;
 
 #[cfg(feature = "serde")]
 use ron::ser::PrettyConfig;
@@ -111,35 +106,15 @@ fn edit_ui(mut world: &mut World) {
     #[cfg(feature = "serde")]
     show_save_load_preset_uis(world, &mut egui_context);
 
-    egui::Window::new("gradient colors").show(egui_context.get_mut(), |mut ui| {
-        let mut sky_colors = world.get_resource_mut::<SkyGradients>().unwrap();
-        let mut id = 0;
-        // helper function to render gradient ui
-        // convert our Gradient, to the egui_colorgradient::Gradient
-        // not optimized, but this is just for debug ui :)
-        let mut show_gradient = |gradient: &mut Gradient, ui: &mut egui::Ui| {
-            let mut c_0: egui_colorgradient::Gradient = gradient_to_egui(gradient.clone());
-            id += 1;
-            ui.push_id(id.to_string().as_str(), |ui| {
-                gradient_editor(ui, &mut c_0);
-            });
-            let mut stops = Vec::with_capacity(4);
-            for (weight, hsva) in c_0.stops.iter() {
-                stops.push((*weight, hsva.to_srgba_premultiplied()));
-            }
-            gradient.stops = stops;
-        };
-        show_gradient(&mut sky_colors.sky_color0, &mut ui);
-        show_gradient(&mut sky_colors.sky_color1, &mut ui);
-        show_gradient(&mut sky_colors.sky_color2, &mut ui);
-        show_gradient(&mut sky_colors.sky_color3, &mut ui);
-    });
-
     egui::Window::new("sky settings").show(egui_context.get_mut(), |ui| {
         egui::ScrollArea::both().show(ui, |ui| {
             ui.label("sky time");
-            ui_for_resource::<SkyTime>(world, ui);
-            ui_for_resource::<SunSettings>(world, ui);
+            ui.push_id("skytime", |ui| {
+                ui_for_resource::<SkyTime>(world, ui);
+            });
+            ui.push_id("sunsettings", |ui| {
+                ui_for_resource::<SunSettings>(world, ui);
+            });
             let mut dirlight = world
                 .query_filtered::<&mut DirectionalLight, With<SunDriverTag>>()
                 .single_mut(&mut world)
@@ -220,7 +195,7 @@ fn show_save_load_preset_uis(world: &mut World, egui_context: &mut EguiContext) 
                     match std::fs::read(entry.path()) {
                         Ok(bytes) => match ron::de::from_bytes::<SkyPreset>(&bytes) {
                             Ok(preset) => {
-                                world.send_event(ApplyPresetEvent { sky_preset: preset });
+                                world.write_message(ApplyPresetEvent { sky_preset: preset });
                             }
                             Err(err) => {
                                 let mut result =
@@ -261,21 +236,4 @@ fn setup_egui_render_layer(
         },
         RenderLayers::none(),
     ));
-}
-
-// helper to convert our Gradient, into egui_colorgradient
-use bevy_inspector_egui::egui::Color32;
-fn gradient_to_egui(gradient: Gradient) -> egui_colorgradient::Gradient {
-    use egui_colorgradient::InterpolationMethod;
-    let mut stops = Vec::with_capacity(4);
-    for (weight, color) in gradient.stops.iter() {
-        stops.push((
-            *weight,
-            Color32::from_rgba_premultiplied(color[0], color[1], color[2], color[3]).into(),
-        ));
-    }
-    egui_colorgradient::Gradient {
-        stops: stops,
-        interpolation_method: InterpolationMethod::Linear,
-    }
 }

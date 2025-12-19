@@ -4,11 +4,11 @@ use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 
-///! All the current colors that controlls the sky gradient
-///! a sky gradient has 4 colors, and we animate it based upon the "sky time"
-///! gradient stops 0.0 -> 0.5 = DAY time colors
-///! gradient stops 0.5 -> 1.0 = NIGHT time colors
-///! Use the SkyColorsBuilder to easily construct the colors from variables like: day_color, night_color
+/// All the current colors that controlls the sky gradient
+/// a sky gradient has 4 colors, and we animate it based upon the "sky time"
+/// gradient stops 0.0 -> 0.5 = DAY time colors
+/// gradient stops 0.5 -> 1.0 = NIGHT time colors
+/// Use the SkyColorsBuilder to easily construct the colors from variables like: day_color, night_color
 #[derive(Resource)]
 pub struct SkyGradients {
     pub sky_color0: Gradient,
@@ -81,7 +81,7 @@ impl GradientBuilder {
 }
 
 /// helper for designing gradients based upon time settings
-///! if we want specific time of day colors. like "day_high_color"
+/// if we want specific time of day colors. like "day_high_color"
 /// the helper helps distribute these colors over a gradient based upon the SkyTimeSettings
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Resource)]

@@ -6,8 +6,8 @@ use bevy::prelude::*;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-///! used to build a ScalarGradient, bsed upon SkyTimeSettings
-///! places the color we want based upon the timing of SkyTimeSettings
+/// used to build a ScalarGradient, bsed upon SkyTimeSettings
+/// places the color we want based upon the timing of SkyTimeSettings
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Reflect)]
 pub struct ScalarGradientBuilder {
@@ -40,7 +40,7 @@ impl ScalarGradientBuilder {
     }
 }
 
-///! the current ambient colors
+/// the current ambient colors
 #[derive(Resource, Clone)]
 pub struct AmbientColors {
     pub color_gradient: Gradient,
@@ -59,8 +59,8 @@ impl Default for AmbientColors {
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Resource, Reflect, Clone)]
 pub struct AmbientSettings {
-    ///! this is the max ambient color brightness value
-    ///! will be multiplied by the brightness_gradient
+    /// this is the max ambient color brightness value
+    /// will be multiplied by the brightness_gradient
     pub brightness_multiplier: f32,
 }
 
@@ -150,7 +150,7 @@ impl Plugin for AmbientDriverPlugin {
     }
 }
 
-///! rebuild the ambient gradients because SkyTimeSettings changed
+/// rebuild the ambient gradients because SkyTimeSettings changed
 fn update_ambient_colors_builder(
     sky_time_settings: Res<SkyTimeSettings>,
     mut ambient_colors: ResMut<AmbientColors>,

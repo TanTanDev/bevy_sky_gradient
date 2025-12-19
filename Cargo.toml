@@ -1,6 +1,6 @@
 [package]
 name = "bevy_sky_gradient"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 keywords = ["bevy", "skybox", "atmosphere", "procedural", "gamedev"]
 categories = ["game-development", "rendering"]
@@ -14,7 +14,7 @@ default = ["serde"]
 serde = ["dep:serde", "dep:ron", "dep:bincode"]
 
 [dependencies]
-bevy = "0.16"
+bevy = "0.17"
 thiserror = "2"
 
 # optional serialization
@@ -26,6 +26,5 @@ bincode = {version = "2", optional = true, features = ["serde"]}
 
 [dev-dependencies]
 rand = "0.9"
-bevy_flycam = "0.16.1"
-egui-colorgradient = "0.2.3"
-bevy-inspector-egui = "0.33"
+bevy_flycam = "0.17"
+bevy-inspector-egui = "0.35"

@@ -1,5 +1,10 @@
+use bevy::mesh::MeshVertexBufferLayoutRef;
+use bevy::pbr::{MaterialPipeline, MaterialPipelineKey};
 use bevy::prelude::*;
-use bevy::render::render_resource::{AsBindGroup, CompareFunction, ShaderRef};
+use bevy::render::render_resource::{
+    AsBindGroup, CompareFunction, RenderPipelineDescriptor, SpecializedMeshPipelineError,
+};
+use bevy::shader::ShaderRef;
 
 use crate::bind_groups::AuroraBindGroup;
 
@@ -16,19 +21,17 @@ pub struct AuroraMaterial {
 impl Material for AuroraMaterial {
     fn vertex_shader() -> ShaderRef {
         crate::assets::FULL_AURORA_SHADER_HANDLE.into()
-        // "embedded://bevy_sky_gradient/../assets/shaders/full_aurora.wgsl".into()
     }
     fn fragment_shader() -> ShaderRef {
-        // "embedded://bevy_sky_gradient/../assets/shaders/full_aurora.wgsl".into()
         crate::assets::FULL_AURORA_SHADER_HANDLE.into()
     }
 
     fn specialize(
-        _pipeline: &bevy::pbr::MaterialPipeline<Self>,
-        descriptor: &mut bevy::render::render_resource::RenderPipelineDescriptor,
-        _layout: &bevy::render::mesh::MeshVertexBufferLayoutRef,
-        _key: bevy::pbr::MaterialPipelineKey<Self>,
-    ) -> Result<(), bevy::render::render_resource::SpecializedMeshPipelineError> {
+        _pipeline: &MaterialPipeline,
+        descriptor: &mut RenderPipelineDescriptor,
+        _layout: &MeshVertexBufferLayoutRef,
+        _key: MaterialPipelineKey<Self>,
+    ) -> Result<(), SpecializedMeshPipelineError> {
         if let Some(depth_stencil) = &mut descriptor.depth_stencil {
             depth_stencil.depth_write_enabled = false;
             depth_stencil.depth_compare = CompareFunction::Always;

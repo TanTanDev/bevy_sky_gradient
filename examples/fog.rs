@@ -1,9 +1,8 @@
 use bevy::{
+    camera::visibility::RenderLayers,
     prelude::*,
-    render::{
-        render_resource::{AsBindGroup, ShaderRef, ShaderType},
-        view::RenderLayers,
-    },
+    render::render_resource::{AsBindGroup, ShaderType},
+    shader::ShaderRef,
 };
 use bevy_flycam::{FlyCam, NoCameraPlayerPlugin};
 use bevy_inspector_egui::{

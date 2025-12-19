@@ -2,8 +2,8 @@ use bevy::prelude::*;
 
 use crate::sky_material::FullSkyMaterial;
 
-///! introduce a sky timer that our SunDriver+GradientDriver
-///! can use to animate the sky over time
+/// introduce a sky timer that our SunDriver+GradientDriver
+/// can use to animate the sky over time
 #[derive(Clone)]
 pub struct SkyCyclePlugin {
     pub sky_time_settings: SkyTimeSettings,
@@ -57,7 +57,7 @@ fn drive_night_time(
     skybox_material.night_time_distance = sky_time_settings.night_time_distance(sky_time.time);
 }
 
-///! The current sky time
+/// The current sky time
 #[derive(Resource, Reflect, Clone)]
 pub struct SkyTime {
     pub time: f32,
@@ -73,16 +73,16 @@ impl Default for SkyTime {
     }
 }
 
-///! the sky timings
+/// the sky timings
 #[derive(Resource, Clone, Reflect)]
 pub struct SkyTimeSettings {
-    // how many seconds of day light
+    /// how many seconds of day light
     pub day_time_sec: f32,
-    // how many seconds of night light
+    /// how many seconds of night light
     pub night_time_sec: f32,
-    // seconds of sunrise, ("steals" from day time)
+    /// seconds of sunrise, ("steals" from day time)
     pub sunrise_time_sec: f32,
-    // seconds of sunset, ("steals" from night time)
+    /// seconds of sunset, ("steals" from night time)
     pub sunset_time_sec: f32,
 }
 
@@ -111,8 +111,8 @@ impl SkyTimeSettings {
         (self.day_percent(time) + self.night_percent(time)) * 0.5
     }
     #[inline]
-    ///! 0: Not close to night time
-    ///! 1: fully night
+    /// 0: Not close to night time
+    /// 1: fully night
     pub fn night_time_distance(&self, time: f32) -> f32 {
         1.0 - (self.night_percent(time) - 0.5).abs() * 2.0
     }

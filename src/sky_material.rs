@@ -1,5 +1,8 @@
+use bevy::mesh::MeshVertexBufferLayoutRef;
+use bevy::pbr::MaterialPipeline;
 use bevy::prelude::*;
-use bevy::render::render_resource::{AsBindGroup, CompareFunction, ShaderRef};
+use bevy::render::render_resource::{AsBindGroup, CompareFunction, RenderPipelineDescriptor};
+use bevy::shader::ShaderRef;
 
 use crate::bind_groups::{StarsBindGroup, SunBindGroup};
 
@@ -9,16 +12,16 @@ pub struct FullSkyMaterial {
     pub sun: crate::bind_groups::SunBindGroup,
     #[uniform(1)]
     pub stars: crate::bind_groups::StarsBindGroup,
-    ///! auto set. 0 = NO night, 1 = FULL night
-    ///! a full night cycle will go from 0 -> 1 -> 0
+    /// auto set. 0 = NO night, 1 = FULL night
+    /// a full night cycle will go from 0 -> 1 -> 0
     #[uniform(2)]
     pub night_time_distance: f32,
-    ///! when in the night time to show the stars
-    ///! x: when to start showing star
-    ///! y: when the brightness of star is MAXED out
-    ///! example: (0.0, 0.1).
-    ///! 0.0: start showing sky immediately when sunset begins
-    ///! 0.1: sky brightness is maxed out 10% into the night
+    /// when in the night time to show the stars
+    /// x: when to start showing star
+    /// y: when the brightness of star is MAXED out
+    /// example: (0.0, 0.1).
+    /// 0.0: start showing sky immediately when sunset begins
+    /// 0.1: sky brightness is maxed out 10% into the night
     #[uniform(3)]
     pub night_visibility_range: Vec2,
 
@@ -54,9 +57,9 @@ impl Material for FullSkyMaterial {
     }
 
     fn specialize(
-        _pipeline: &bevy::pbr::MaterialPipeline<Self>,
-        descriptor: &mut bevy::render::render_resource::RenderPipelineDescriptor,
-        _layout: &bevy::render::mesh::MeshVertexBufferLayoutRef,
+        _pipeline: &MaterialPipeline,
+        descriptor: &mut RenderPipelineDescriptor,
+        _layout: &MeshVertexBufferLayoutRef,
         _key: bevy::pbr::MaterialPipelineKey<Self>,
     ) -> Result<(), bevy::render::render_resource::SpecializedMeshPipelineError> {
         if let Some(depth_stencil) = &mut descriptor.depth_stencil {
