@@ -2,7 +2,8 @@
 name = "bevy_sky_gradient"
 version = "0.1.0"
 edition = "2024"
-categories = ["bevy"]
+keywords = ["bevy", "skybox", "atmosphere", "procedural", "gamedev"]
+categories = ["game-development", "rendering"]
 license = "MIT or Apache-2.0"
 readme = "README.md"
 description = "Sky rendering plugin for bevy featuring, sky gradient, aurora / northern lights, stars, sun, day-night cycle"
