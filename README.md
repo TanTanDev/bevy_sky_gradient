@@ -1,4 +1,4 @@
-# Bevy Gradient Sky
+# Bevy Sky Gradient
 
 A simple and beautiful procedural sky shader for the Bevy game engine.
 
@@ -6,7 +6,7 @@ A simple and beautiful procedural sky shader for the Bevy game engine.
 
 ## Features
 
-- **Procedural Skybox:** A beautiful, customizable skybox that includes a dynamic sun, stars, and auroras.
+- **Skybox:** Everything is rendered using skyboxes. Supports gradient coloring, sun, stars, and auroras.
 - **Day-Night Cycle:** Animate the sky from sunrise to sunset and through the night. You can easily configure the duration of the cycle.
 - **Procedural Sun:** A sun that moves across the sky, synchronized with the day-night cycle, casting a directional light in your scene.
 - **Stars & Auroras:** As night falls, stars and procedural auroras will light up the sky.
@@ -80,6 +80,13 @@ SkyPlugin::builder()
 - **Aurora (`AuroraPlugin`):** This plugin adds a beautiful procedural aurora effect to the night sky. The aurora is rendered to a separate texture for better performance and is then blended with the main skybox. You can adjust the render quality of the aurora via the `AuroraSettings` resource.
 
 - **Rendering to a Texture:** For advanced use cases like screen-space fog or reflections, you can have the skybox render to a texture instead of directly to the screen. Use the `.with_render_sky_to_texture()` method on the `SkyPluginBuilder`.
+
+
+## Bevy support table
+
+| bevy | Bevy Gradient Sky |
+| ---- | ------------------- |
+| 0.16 | 0.1.0               |
 
 ## License
 
