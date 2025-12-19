@@ -1,5 +1,6 @@
 # Bevy Sky Gradient
 [![Crates.io](https://img.shields.io/crates/v/bevy_sky_gradient.svg)](https://crates.io/crates/bevy_sky_gradient)
+[![docs.rs](https://img.shields.io/docsrs/game_stat.svg)](https://docs.rs/game_stat/latest/game_stat/)
 [![MIT/Apache 2.0](https://img.shields.io/badge/license-MIT%2FApache-blue.svg)](./LICENSE)
 [![Crates.io](https://img.shields.io/crates/d/bevy_sky_gradient.svg)](https://crates.io/crates/bevy_sky_gradient)
 
