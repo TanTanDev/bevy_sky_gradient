@@ -17,7 +17,7 @@ serde = ["dep:serde", "dep:ron", "dep:bincode"]
 version = "0.17.3"
 default-features = false
 features = [
-    "bevy_window",
+    "bevy_winit",
     "bevy_render",
     "bevy_pbr",
     "bevy_core_pipeline",
@@ -27,6 +27,8 @@ features = [
     "bevy_gltf",
     "bevy_log",
     "bevy_sprite",
+    "bevy_text",
+    "tonemapping_luts",
 ]
 
 [dependencies]
