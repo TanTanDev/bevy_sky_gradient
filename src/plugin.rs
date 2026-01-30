@@ -1,11 +1,10 @@
 use bevy::{
     asset::RenderAssetUsages,
-    camera::visibility::RenderLayers,
+    camera::{RenderTarget, visibility::RenderLayers},
     image::ImageSampler,
     prelude::*,
     render::render_resource::{Extent3d, TextureDimension, TextureFormat, TextureUsages},
 };
-
 use crate::{
     ambient_driver::AmbientDriverPlugin,
     aurora::AuroraPlugin,
@@ -281,10 +280,10 @@ fn spawn_default_skybox_gradient(
         GradientCameraTag,
         Camera {
             order: sky_settings.camera_gradient_order,
-            target: gradient_texture_handle.render_target.clone().into(),
             clear_color: ClearColorConfig::Custom(Color::NONE),
             ..default()
         },
+        RenderTarget::Image(gradient_texture_handle.render_target.clone().into()),
         Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)).looking_at(Vec3::ZERO, Vec3::Y),
         sky_settings.skybox_gradient_render_layer.clone(),
     ));
