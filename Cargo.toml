@@ -14,7 +14,7 @@ default = ["serde"]
 serde = ["dep:serde", "dep:ron", "dep:bincode"]
 
 [dependencies]
-bevy = "0.17"
+bevy = "0.18"
 thiserror = "2"
 
 # optional serialization
@@ -26,5 +26,5 @@ bincode = {version = "2", optional = true, features = ["serde"]}
 
 [dev-dependencies]
 rand = "0.9"
-bevy_flycam = "0.17"
-bevy-inspector-egui = "0.35"
+bevy_flycam = "0.18"
+bevy-inspector-egui = "0.36"
