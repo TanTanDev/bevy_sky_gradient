@@ -145,7 +145,7 @@ fn force_material_update(
             // This operation *should* force Bevy to re-prepare the material's bind group
             // and re-evaluate its texture view dependency.
             // The actual bug is on the Camera's side, but this is the user workaround.
-            materials.get_mut(handle).map(|_| ()); // Get mutable reference to flag change
+            // materials.get_mut(handle).map(|_| ()); // Get mutable reference to flag change
         }
     }
 }

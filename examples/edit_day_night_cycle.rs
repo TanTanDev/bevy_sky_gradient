@@ -126,7 +126,7 @@ fn edit_ui(mut world: &mut World) {
                 dirlight.color = Color::srgb_from_array(lin);
             }
             ui.label("ambient color");
-            ui_for_resource::<AmbientLight>(world, ui);
+            ui_for_resource::<GlobalAmbientLight>(world, ui);
         });
     });
 }

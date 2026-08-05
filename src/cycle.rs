@@ -51,7 +51,7 @@ fn drive_night_time(
     let skybox_material_handle = skyboxes
         .single()
         .expect("1 entity with SkyGradientMaterial");
-    let skybox_material = sky_materials
+    let mut skybox_material = sky_materials
         .get_mut(skybox_material_handle)
         .expect("SkyBoxMaterial");
     skybox_material.night_time_distance = sky_time_settings.night_time_distance(sky_time.time);
