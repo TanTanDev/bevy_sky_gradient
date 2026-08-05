@@ -5,3 +5,5 @@
 !/assets/sky_presets/default.ron
 !/assets/sky_presets/purple.ron
 Cargo.lock
+
+.cargo/config.toml
