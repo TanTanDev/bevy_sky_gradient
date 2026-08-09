@@ -39,7 +39,7 @@ impl Default for SkySettings {
     }
 }
 
-/// controlls what features you want.  
+/// controlls what features you want.
 /// you might not want to use the default Cycle/SunDriver/GradientDriver/Aurora for example
 /// then you can skip that plugin and implement your own.
 pub struct SkyPluginBuilder {

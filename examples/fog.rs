@@ -1,3 +1,5 @@
+use std::ops::DerefMut;
+
 use bevy::{
     camera::visibility::RenderLayers,
     prelude::*,
@@ -141,11 +143,11 @@ fn force_material_update(
 ) {
     // If the sky state changed or the image was resized this frame:
     for handle in query.iter() {
-        if let Some(_material) = materials.get_mut(handle) {
+        if let Some(mut _material) = materials.get_mut(handle) {
             // This operation *should* force Bevy to re-prepare the material's bind group
             // and re-evaluate its texture view dependency.
             // The actual bug is on the Camera's side, but this is the user workaround.
-            materials.get_mut(handle).map(|_| ()); // Get mutable reference to flag change
+            let _ = _material.deref_mut();
         }
     }
 }

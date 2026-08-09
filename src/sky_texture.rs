@@ -134,7 +134,7 @@ fn resize_full_sky_on_window_change(
     let width = window.width() as u32;
     let height = window.height() as u32;
 
-    if let Some(image) = images.get_mut(&sky_handles.render_target) {
+    if let Some(mut image) = images.get_mut(&sky_handles.render_target) {
         image.resize(Extent3d {
             width,
             height,

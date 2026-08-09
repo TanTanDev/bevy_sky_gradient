@@ -142,7 +142,8 @@ impl Plugin for AmbientDriverPlugin {
         app.add_systems(
             Update,
             update_ambient_colors_builder.run_if(
-                resource_changed::<SkyTimeSettings>.or(resource_changed::<AmbientColorsBuilder>),
+                resource_changed::<SkyTimeSettings>
+                    .or_else(resource_changed::<AmbientColorsBuilder>),
             ),
         );
 

@@ -125,7 +125,7 @@ fn resize_aurora_on_window_change(
     let width = width.max(2);
     let height = height.max(2);
 
-    if let Some(image) = images.get_mut(&aurora_handles.render_target) {
+    if let Some(mut image) = images.get_mut(&aurora_handles.render_target) {
         image.resize(Extent3d {
             width,
             height,
