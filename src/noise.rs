@@ -88,7 +88,7 @@ pub fn on_asset_load_texture_update(
     };
     commands.remove_resource::<PendingNoiseTextureAsset>();
     match images.get_mut(&noise_handles.noise3) {
-        Some(noise3_img) => {
+        Some(mut noise3_img) => {
             noise3_img.resize(Extent3d {
                 width: noise_asset.noise3_size,
                 height: noise_asset.noise3_size,
@@ -101,7 +101,7 @@ pub fn on_asset_load_texture_update(
     }
 
     match images.get_mut(&noise_handles.voronoi3) {
-        Some(voronoi3_img) => {
+        Some(mut voronoi3_img) => {
             voronoi3_img.resize(Extent3d {
                 width: noise_asset.voronoi3_size,
                 height: noise_asset.voronoi3_size,
@@ -160,7 +160,7 @@ pub fn update_noise_textures(
     }
 
     // generate and set noise texture
-    if let Some(noise3_image) = images.get_mut(&noise_handles.noise3) {
+    if let Some(mut noise3_image) = images.get_mut(&noise_handles.noise3) {
         let same_size = noise3_image.texture_descriptor.size.width == noise_size;
         if !same_size {
             noise3_image.resize(Extent3d {
@@ -173,7 +173,7 @@ pub fn update_noise_textures(
         }
     }
 
-    if let Some(voronoi3_image) = images.get_mut(&noise_handles.voronoi3) {
+    if let Some(mut voronoi3_image) = images.get_mut(&noise_handles.voronoi3) {
         let same_size = voronoi3_image.texture_descriptor.size.width == voronoi_size;
         if !same_size {
             voronoi3_image.resize(Extent3d {
@@ -400,6 +400,7 @@ pub enum NoiseTextureLoaderError {
 }
 
 #[cfg(feature = "serde")]
+#[derive(TypePath)]
 pub struct NoiseTextureAssetLoader;
 
 #[cfg(feature = "serde")]

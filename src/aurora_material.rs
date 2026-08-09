@@ -33,8 +33,8 @@ impl Material for AuroraMaterial {
         _key: MaterialPipelineKey<Self>,
     ) -> Result<(), SpecializedMeshPipelineError> {
         if let Some(depth_stencil) = &mut descriptor.depth_stencil {
-            depth_stencil.depth_write_enabled = false;
-            depth_stencil.depth_compare = CompareFunction::Always;
+            depth_stencil.depth_write_enabled = Some(false);
+            depth_stencil.depth_compare = Some(CompareFunction::Always);
         }
 
         Ok(())

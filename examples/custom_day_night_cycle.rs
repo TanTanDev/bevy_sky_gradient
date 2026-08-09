@@ -77,7 +77,7 @@ fn setup(
         DirectionalLight {
             color: WHITE.into(),
             illuminance: AMBIENT_DAYLIGHT,
-            shadows_enabled: true,
+            shadow_maps_enabled: true,
             ..default()
         },
         Transform::default(),
