@@ -13,8 +13,25 @@ repository = "https://github.com/TanTanDev/bevy_sky_gradient"
 default = ["serde"]
 serde = ["dep:serde", "dep:ron", "dep:bincode"]
 
+[dependencies.bevy]
+version = "0.19"
+default-features = false
+features = [
+    "bevy_winit",
+    "bevy_render",
+    "bevy_pbr",
+    "bevy_core_pipeline",
+    "bevy_camera",
+    "bevy_mesh",
+    "bevy_asset",
+    "bevy_gltf",
+    "bevy_log",
+    "bevy_sprite",
+    "bevy_text",
+    "tonemapping_luts",
+]
+
 [dependencies]
-bevy = "0.19"
 thiserror = "2"
 
 # optional serialization
@@ -25,6 +42,7 @@ ron = {version = "0.12", optional = true}
 bincode = {version = "2", optional = true, features = ["serde"]}
 
 [dev-dependencies]
+bevy = {version = "0.19", default-features = true}
 rand = "0.9"
 bevy_flycam = "0.19"
 bevy-inspector-egui = "0.37"
