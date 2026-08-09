@@ -164,7 +164,7 @@ fn drive_ambience(
     sky_time: Res<SkyTime>,
     ambient_settings: Res<AmbientSettings>,
     ambient_colors: Res<AmbientColors>,
-    mut ambient_light: ResMut<AmbientLight>,
+    mut ambient_light: ResMut<GlobalAmbientLight>,
 ) {
     let percent = sky_time_settings.time_percent(sky_time.time);
 

@@ -1,11 +1,10 @@
 use bevy::{
-    camera::visibility::RenderLayers,
+    camera::{RenderTarget, visibility::RenderLayers},
     prelude::*,
     render::render_resource::Extent3d,
     transform::plugins::TransformSystems,
     window::{PrimaryWindow, WindowResized},
 };
-
 use crate::{
     aurora_material::AuroraMaterial,
     noise::{NoiseHandles, setup_noise_texture},
@@ -161,10 +160,10 @@ fn spawn_aurora_skybox(
         AuroraCameraTag,
         Camera {
             order: aurora_settings.camera_order,
-            target: aurora_texture_handle.render_target.clone().into(),
             clear_color: ClearColorConfig::Custom(Color::NONE),
             ..default()
         },
+        RenderTarget::Image(aurora_texture_handle.render_target.clone().into()),
         Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)).looking_at(Vec3::ZERO, Vec3::Y),
         aurora_settings.camera_render_layers.clone(),
     ));

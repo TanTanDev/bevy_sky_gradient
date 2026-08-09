@@ -400,6 +400,7 @@ pub enum NoiseTextureLoaderError {
 }
 
 #[cfg(feature = "serde")]
+#[derive(TypePath)]
 pub struct NoiseTextureAssetLoader;
 
 #[cfg(feature = "serde")]
