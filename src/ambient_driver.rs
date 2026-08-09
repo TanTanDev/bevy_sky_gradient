@@ -142,7 +142,8 @@ impl Plugin for AmbientDriverPlugin {
         app.add_systems(
             Update,
             update_ambient_colors_builder.run_if(
-                resource_changed::<SkyTimeSettings>.or(resource_changed::<AmbientColorsBuilder>),
+                resource_changed::<SkyTimeSettings>
+                    .or_else(resource_changed::<AmbientColorsBuilder>),
             ),
         );
 
@@ -164,7 +165,7 @@ fn drive_ambience(
     sky_time: Res<SkyTime>,
     ambient_settings: Res<AmbientSettings>,
     ambient_colors: Res<AmbientColors>,
-    mut ambient_light: ResMut<AmbientLight>,
+    mut ambient_light: ResMut<GlobalAmbientLight>,
 ) {
     let percent = sky_time_settings.time_percent(sky_time.time);
 

@@ -22,7 +22,7 @@ A simple and beautiful procedural sky shader for the Bevy game engine.
 Add the `bevy_sky_gradient` crate to your `Cargo.toml`:
 ```toml
 [dependencies]
-bevy_sky_gradient = "0.2.0"
+bevy_sky_gradient = "0.4.0"
 ```
 
 Then, add the `SkyPlugin` to your app and add the `SkyboxMagnetTag` to your camera.
@@ -43,10 +43,8 @@ fn main() {
 fn setup(mut commands: Commands) {
     // Spawn a camera
     commands.spawn((
-        Camera3dBundle {
-            transform: Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
-            ..default()
-        },
+        Camera3d::default(),
+        Transform::from_xyz(-0.4, 0.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
         // Add this tag to make the skybox follow the camera
         SkyboxMagnetTag,
     ));
@@ -90,6 +88,8 @@ SkyPlugin::builder()
 
 | bevy | Bevy Sky Gradient |
 | ---- | ------------------- |
+| 0.19 | 0.4.0               |
+| 0.18 | 0.3.0               |
 | 0.17 | 0.2.0               |
 | 0.16 | 0.1.0               |
 

@@ -1,6 +1,6 @@
 use bevy::{
     asset::RenderAssetUsages,
-    camera::visibility::RenderLayers,
+    camera::{RenderTarget, visibility::RenderLayers},
     image::ImageSampler,
     prelude::*,
     render::render_resource::{Extent3d, TextureDimension, TextureFormat, TextureUsages},
@@ -91,8 +91,8 @@ pub fn spawn_full_sky_texture(
         .single()
         .map_or((1.0, 1.0), |v| (v.width(), v.height()));
     let size = Extent3d {
-        width: width as u32,
-        height: height as u32,
+        width: width.max(1.0) as u32,
+        height: height.max(1.0) as u32,
         ..default()
     };
 
@@ -134,7 +134,11 @@ fn resize_full_sky_on_window_change(
     let width = window.width() as u32;
     let height = window.height() as u32;
 
-    if let Some(image) = images.get_mut(&sky_handles.render_target) {
+    if width == 0 || height == 0 {
+        return;
+    }
+
+    if let Some(mut image) = images.get_mut(&sky_handles.render_target) {
         image.resize(Extent3d {
             width,
             height,
@@ -155,10 +159,10 @@ fn spawn_full_sky_camera(
         FullSkyCameraTag,
         Camera {
             order: settings.full_sky_camera_order,
-            target: full_sky_handle.render_target.clone().into(),
             clear_color: ClearColorConfig::Custom(Color::NONE),
             ..default()
         },
+        RenderTarget::Image(full_sky_handle.render_target.clone().into()),
         Transform::default(),
         settings.sky_render_layer.clone(), // The camera also needs the render layer
     ));

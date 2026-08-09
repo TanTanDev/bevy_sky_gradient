@@ -26,7 +26,7 @@ impl Plugin for GradientDriverPlugin {
         app.add_systems(
             Update,
             update_sky_colors_builder.run_if(
-                resource_changed::<SkyTimeSettings>.or(resource_changed::<SkyGradientBuilder>),
+                resource_changed::<SkyTimeSettings>.or_else(resource_changed::<SkyGradientBuilder>),
             ),
         );
         app.add_systems(PostUpdate, resize_gradient_on_window_change);
@@ -55,7 +55,7 @@ fn drive_gradients(
     let skybox_material_handle = skyboxes
         .single()
         .expect("1 entity with SkyGradientMaterial");
-    let skybox_material = sky_materials
+    let mut skybox_material = sky_materials
         .get_mut(skybox_material_handle)
         .expect("SkyBoxMaterial");
 
@@ -102,7 +102,7 @@ fn resize_gradient_on_window_change(
         return;
     };
 
-    if let Some(image) = images.get_mut(&aurora_handles.render_target) {
+    if let Some(mut image) = images.get_mut(&aurora_handles.render_target) {
         image.resize(Extent3d {
             width: (window.width() as u32).max(2),
             height: (window.height() as u32).max(2),
