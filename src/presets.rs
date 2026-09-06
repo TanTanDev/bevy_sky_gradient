@@ -77,9 +77,9 @@ pub fn handle_apply_preset_events(
     skyboxes: Query<&mut MeshMaterial3d<FullSkyMaterial>>,
     auroras: Query<&mut MeshMaterial3d<AuroraMaterial>>,
     gradient_handles: Query<&mut MeshMaterial3d<FullGradientMaterial>>,
-    mut sky_materials: ResMut<Assets<FullSkyMaterial>>,
-    mut auroras_materials: ResMut<Assets<AuroraMaterial>>,
-    mut gradient_materials: ResMut<Assets<FullGradientMaterial>>,
+    mut sky_materials_optional: Option<ResMut<Assets<FullSkyMaterial>>>,
+    mut auroras_materials_optional: Option<ResMut<Assets<AuroraMaterial>>>,
+    mut gradient_materials_optional: Option<ResMut<Assets<FullGradientMaterial>>>,
     mut sky_colors_builder_optional: Option<ResMut<SkyGradientBuilder>>,
     mut sun_settings_optional: Option<ResMut<SunSettings>>,
 ) {
@@ -96,31 +96,37 @@ pub fn handle_apply_preset_events(
         }
 
         if let Some(star_settings) = &event.sky_preset.stars {
-            let skybox_material_handle = skyboxes
-                .single()
-                .expect("1 entity with SkyGradientMaterial");
-            let mut skybox_material = sky_materials
-                .get_mut(skybox_material_handle)
-                .expect("SkyBoxMaterial");
-            skybox_material.stars = star_settings.clone();
+            if let Some(sky_materials) = sky_materials_optional.as_mut() {
+                let skybox_material_handle = skyboxes
+                    .single()
+                    .expect("1 entity with SkyGradientMaterial");
+                let mut skybox_material = sky_materials
+                    .get_mut(skybox_material_handle)
+                    .expect("SkyBoxMaterial");
+                skybox_material.stars = star_settings.clone();
+            }
         }
 
         if let Some(aurora_bind_group) = &event.sky_preset.aurora_settings {
-            let aurora_material_handle =
-                auroras.single().expect("1 entity with SkyGradientMaterial");
-            let mut aurora_material = auroras_materials
-                .get_mut(aurora_material_handle)
-                .expect("auroraMaterial");
-            aurora_material.aurora_settings = aurora_bind_group.clone();
+            if let Some(auroras_materials) = auroras_materials_optional.as_mut() {
+                let aurora_material_handle =
+                    auroras.single().expect("1 entity with SkyGradientMaterial");
+                let mut aurora_material = auroras_materials
+                    .get_mut(aurora_material_handle)
+                    .expect("auroraMaterial");
+                aurora_material.aurora_settings = aurora_bind_group.clone();
+            }
         }
         if let Some(gradient_bind_group) = &event.sky_preset.gradient_bind_group {
-            let gradient_material_handle = gradient_handles
-                .single()
-                .expect("1 entity with FullGradientMaterial");
-            let mut gradient_material = gradient_materials
-                .get_mut(gradient_material_handle)
-                .expect("gradientMaterial");
-            gradient_material.gradient_bind_group = gradient_bind_group.clone();
+            if let Some(gradient_materials) = gradient_materials_optional.as_mut() {
+                let gradient_material_handle = gradient_handles
+                    .single()
+                    .expect("1 entity with FullGradientMaterial");
+                let mut gradient_material = gradient_materials
+                    .get_mut(gradient_material_handle)
+                    .expect("gradientMaterial");
+                gradient_material.gradient_bind_group = gradient_bind_group.clone();
+            }
         }
     }
 }
