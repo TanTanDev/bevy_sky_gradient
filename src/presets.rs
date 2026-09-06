@@ -45,8 +45,8 @@ pub const DEFAULT_SKY_COLORS_BUILDER: SkyGradientBuilder = SkyGradientBuilder {
     },
 };
 
-/// data that controlls the look of a sky
-/// (not aurora upsampling size, nor noise 3dTexture, performance and "look" should be seperate)
+/// data that controls the look of a sky
+/// (not aurora upsampling size, nor noise 3dTexture, performance and "look" should be separate)
 /// (None) values will not override current sky settings.
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Default)]
