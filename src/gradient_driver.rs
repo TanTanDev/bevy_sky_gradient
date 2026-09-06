@@ -21,7 +21,7 @@ impl Plugin for GradientDriverPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, drive_gradients);
 
-        // initial sky color values will be wrong, until SkyTimeSettings can be fetched in update_sky_colors_builer
+        // initial sky color values will be wrong, until SkyTimeSettings can be fetched in update_sky_colors_builder
         app.insert_resource(self.sky_colors_builder.build(&SkyTimeSettings::default()));
         app.add_systems(
             Update,
