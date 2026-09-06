@@ -90,13 +90,17 @@ fn aurora_follow_camera(
 fn resize_aurora_on_window_change(
     mut resize_events: MessageReader<WindowResized>,
     mut images: ResMut<Assets<Image>>,
+    aurora_material_optional: Option<ResMut<Assets<AuroraMaterial>>>,
     aurora_handles: Res<AuroraTextureHandle>,
     aurora_settings: Res<AuroraSettings>,
     primary_windows: Query<&Window, With<PrimaryWindow>>,
     mut repeated_calls: Local<i32>,
 ) {
+    if aurora_material_optional.is_none() {
+        return;
+    };
     let mut update_aurora = aurora_settings.is_changed();
-
+    
     for event in resize_events.read() {
         let is_primary = primary_windows.get(event.window).is_ok();
         update_aurora |= is_primary;
